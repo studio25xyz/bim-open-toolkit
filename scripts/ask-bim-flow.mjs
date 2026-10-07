@@ -7,7 +7,7 @@
 // the host (default http://127.0.0.1:5218); BOF_ASK_ROWS the rows to show.
 //
 // A --file line may carry an expected answer after a tab: `request<TAB>expected`
-// (see samples/ask/requests.txt). When present, it is printed next to the
+// (see samples/ask/toolkit-requests.txt). When present, it is printed next to the
 // answer rows and in the summary line, so a person can judge correct, honest
 // or wrong by eye; the script does not score the match itself, because the
 // expected text is usually a sentence ("290 rooms total"), not a value the

@@ -1,7 +1,5 @@
 # Questions about the toolkit itself (TKT-127), for scripts/ask-bim-flow.mjs --file.
-# Same format as requests.txt: `request<TAB>expected`. Kept apart from requests.txt
-# because that file is PROJECT.md's ten-question set over the Snowdon export, and
-# these need no database: the right behaviour is a text answer from searchDocs and
+# Format: `request<TAB>expected`. These need no database: the right behaviour is a text answer from searchDocs and
 # readDoc that names the files read, with no graph built (the script's ANSWERED
 # verdict; OK would mean a graph was built, which is wrong here). Expected answers
 # were read from the documents named on 2026-09-29.

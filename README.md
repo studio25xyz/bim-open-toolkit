@@ -1,5 +1,15 @@
 <p><img src="site/images/family-banner.svg" alt="BIM Open Toolkit" height="60"></p>
 
+> **About this fork: read this first.**
+>
+> - **Origin.** This is the Studio 2.5 fork of [ara3d/bim-open-toolkit](https://github.com/ara3d/bim-open-toolkit). The toolkit was created by Christopher Diggins at Ara 3D, who holds the copyright, and is released under the MIT licence.
+> - **Pre-release.** This is version 0.1 software under active development. It is provided as is, without warranty of any kind, and is not presented as production ready. Interfaces, file formats, and documents may change.
+> - **Dependencies belong to Ara 3D.** The schema, data, flow, viewer, and notebook code, and three supporting libraries, live in eight separate `ara3d` repositories that `node deps.mjs` fetches at pinned commits. Studio 2.5 does not maintain those repositories.
+> - **One extra setup step for the full build (checked 2026-10-07).** The studio host, the web editor, and both MCP servers build as described below. `dotnet build BimOpenToolkit.sln`, and so the solution-wide test run, also needs the packages `Platonic.Core` and `Platonic.Analyzers` 0.1.0, which are not on nuget.org. Clone [cdiggins/Platonic.CSharp](https://github.com/cdiggins/Platonic.CSharp), run `dotnet pack src/Platonic.Core -c Release` and `dotnet pack src/Platonic.Analyzers -c Release` in it, and set the environment variable `PlatonicRoot` to that clone's full path before building. With that step the solution builds with no errors and the test run CI uses passes (1,533 passed, 8 skipped, 0 failed).
+> - **Sample models.** The MIT licence covers the code, not third-party building models. No model file, image, or sample notebook from Autodesk's Snowdon Towers sample is included in this fork; the demos that name it need your own copy, used under Autodesk's licence terms. Other sample models remain under their owners' terms.
+> - **Browser demos.** The `ara3d.github.io` links below open Ara 3D's published pages, not pages hosted by Studio 2.5.
+
+
 **Try it in the browser:** [the family page](https://ara3d.github.io/bim-open-toolkit/) links the [viewer's five 3D demos](https://ara3d.github.io/bim-open-viewer/) and [twelve sample notebooks](https://ara3d.github.io/bim-open-notebook/), both running with no install and no server.
 
 BIM Open Toolkit gets schedules, checks, charts, and 3D views out of building models
@@ -241,4 +251,4 @@ assessment from 2026-09-08.
 
 ## License
 
-MIT.
+MIT, copyright (c) 2026 Ara 3D; see [LICENSE](LICENSE). The licence covers the code in this repository. It does not cover third-party building models, which stay under their owners' terms.

@@ -50,7 +50,7 @@ function snapshotOf(embed: Embed | undefined): TableSnapshot {
 describe("sample notebooks", () => {
   it("has one notebook per outline", () => {
     expect(sampleFiles.sort()).toEqual(outlineFiles.map((f) => f.replace(/\.outline\.json$/, ".notebook.json")).sort());
-    expect(sampleFiles.length).toBeGreaterThanOrEqual(12);
+    expect(sampleFiles.length).toBeGreaterThanOrEqual(11);
   });
 
   // The notebook package's own outline test checks only its repository's outlines.
