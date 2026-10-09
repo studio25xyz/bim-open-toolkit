@@ -1,3 +1,25 @@
+# Studio 2.5 BIM Open Toolkit
+
+This is Studio 2.5's fork of the BIM Open Toolkit, created by Christopher Diggins at Ara 3D. Studio 2.5 uses it as the open core of its world model platform.
+
+## Why Studio 2.5 forked it
+
+The toolkit runs as a single user local process on model files. Studio 2.5 builds on it for enterprise work, where many teams share many models and connect them to the systems they already run. What Studio 2.5 adds above the open core is the harness that reaches the record and the environment that runs agents against it. Those layers live in Studio 2.5's own platform. Open tools that come out of that work will be added to this fork under the MIT licence.
+
+## Our vision for open source
+
+At Studio 2.5, we believe the foundations of the built environment belong in the open. Our vision is an ecosystem where the way an asset is described can be read, used and improved by anyone who works on it.
+
+By working in the open, we build better schemas and tools through constant examination by the people who use them, and we make sure those foundations keep up with how assets are actually designed, built and operated.
+
+We are committed to building for the designers, builders and owners we serve, while giving the wider industry open and usable foundations to build on. Our open source approach rests on transparency, collaboration and shared progress, because an industry that builds its foundations together moves faster than one that rebuilds them separately.
+
+Studio 2.5 takes its inspiration from [From Hierarchy to Intelligence](https://block.xyz/inside/from-hierarchy-to-intelligence), Jack Dorsey and Roelof Botha's picture of organizations where people and agents work together around a shared world model.
+
+**Contact:** Jeff Walter, [jeffrey.l.walter@studio25.xyz](mailto:jeffrey.l.walter@studio25.xyz), or [studio25.xyz/contact](https://studio25.xyz/contact).
+
+---
+
 <p><img src="site/images/family-banner.svg" alt="BIM Open Toolkit" height="60"></p>
 
 > **About this fork: read this first.**
