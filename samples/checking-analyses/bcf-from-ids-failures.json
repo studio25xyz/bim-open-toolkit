@@ -1,0 +1,141 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "about": {
+      "x": 40,
+      "y": 40,
+      "w": 560,
+      "h": 140
+    },
+    "modelPath": {
+      "x": 40,
+      "y": 685
+    },
+    "model": {
+      "x": 385,
+      "y": 322
+    },
+    "verdicts": {
+      "x": 734,
+      "y": 322
+    },
+    "topics": {
+      "x": 1083,
+      "y": 220
+    },
+    "answer": {
+      "x": 1432,
+      "y": 220
+    },
+    "bcf": {
+      "x": 1083,
+      "y": 598
+    }
+  },
+  "structure": {
+    "inputs": [
+      {
+        "name": "model",
+        "kind": "FilePath",
+        "default": "{SAMPLES}/duplex-enriched.bos",
+        "description": "The building's BIM Open Schema (.bos) file; the NRC Duplex by default, any .bos file works here."
+      }
+    ],
+    "edges": [
+      {
+        "from": "modelPath.path",
+        "to": "model.path"
+      },
+      {
+        "from": "model.entities",
+        "to": "verdicts.entities"
+      },
+      {
+        "from": "model.parameters",
+        "to": "verdicts.parameters"
+      },
+      {
+        "from": "verdicts.verdicts",
+        "to": "topics.issues"
+      },
+      {
+        "from": "topics.topics",
+        "to": "answer.table"
+      },
+      {
+        "from": "verdicts.verdicts",
+        "to": "bcf.issues"
+      },
+      {
+        "from": "modelPath.path",
+        "to": "bcf.model"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "about",
+        "kind": "view.note",
+        "version": 1
+      },
+      {
+        "id": "modelPath",
+        "kind": "value.path",
+        "version": 1
+      },
+      {
+        "id": "model",
+        "kind": "bos.load",
+        "version": 1
+      },
+      {
+        "id": "verdicts",
+        "kind": "ids.check",
+        "version": 1
+      },
+      {
+        "id": "topics",
+        "kind": "bcf.topics",
+        "version": 1
+      },
+      {
+        "id": "answer",
+        "kind": "view.table",
+        "version": 1
+      },
+      {
+        "id": "bcf",
+        "kind": "bcf.write",
+        "version": 1
+      }
+    ]
+  },
+  "values": {
+    "about": {
+      "text": "The DC-W1 door width IDS checked over the Duplex, and its 6 failing doors turned into one BCF topic. topics, shown in answer, is the preview of the file Run writes: nothing is written until then. bcf then writes artifacts/checking/dc-w1-failures.bcf with one viewpoint framing the doors, read from the same model input."
+    },
+    "modelPath": {
+      "path": "$model"
+    },
+    "model": {
+      "harmonize": "false"
+    },
+    "verdicts": {
+      "ids": "{SAMPLES}/ids/dc-w1.ids"
+    },
+    "topics": {
+      "preset": "auto",
+      "verdicts": "Fail"
+    },
+    "answer": {
+      "title": "BCF topics Run will write",
+      "columns": "Title, Elements, Description, Status, GlobalIds"
+    },
+    "bcf": {
+      "path": "{ARTIFACTS}/checking/dc-w1-failures.bcf",
+      "preset": "auto",
+      "verdicts": "Fail",
+      "author": "",
+      "guidSeed": "dc-w1"
+    }
+  }
+}

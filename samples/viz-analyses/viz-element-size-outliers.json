@@ -1,0 +1,541 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "about": {
+      "x": 40,
+      "y": 40,
+      "w": 560,
+      "h": 320
+    },
+    "model": {
+      "x": 40,
+      "y": 583
+    },
+    "measures": {
+      "x": 729,
+      "y": 550
+    },
+    "meshes": {
+      "x": 1083,
+      "y": 686
+    },
+    "perElement": {
+      "x": 1432,
+      "y": 686,
+      "w": 310
+    },
+    "named": {
+      "x": 1831,
+      "y": 686
+    },
+    "solid": {
+      "x": 2203,
+      "y": 686,
+      "w": 310
+    },
+    "height": {
+      "x": 2602,
+      "y": 686
+    },
+    "withStorey": {
+      "x": 2996,
+      "y": 847
+    },
+    "rankInClass": {
+      "x": 3345,
+      "y": 597
+    },
+    "withSize": {
+      "x": 3694,
+      "y": 835
+    },
+    "withMedian": {
+      "x": 4791,
+      "y": 834
+    },
+    "ratio": {
+      "x": 5140,
+      "y": 834
+    },
+    "fold": {
+      "x": 5489,
+      "y": 834
+    },
+    "flagged": {
+      "x": 5838,
+      "y": 834
+    },
+    "scored": {
+      "x": 6192,
+      "y": 834,
+      "w": 310
+    },
+    "ranked": {
+      "x": 6591,
+      "y": 834
+    },
+    "outliers": {
+      "x": 6940,
+      "y": 834
+    },
+    "answer": {
+      "x": 7289,
+      "y": 1562,
+      "w": 310
+    },
+    "database": {
+      "x": 2198,
+      "y": 1068
+    },
+    "inst": {
+      "x": 385,
+      "y": 447
+    },
+    "zrange": {
+      "x": 734,
+      "y": 846
+    },
+    "storeys": {
+      "x": 2597,
+      "y": 1032,
+      "w": 310
+    },
+    "classSize": {
+      "x": 3345,
+      "y": 1097
+    },
+    "middle": {
+      "x": 4043,
+      "y": 914,
+      "w": 310
+    },
+    "medians": {
+      "x": 4442,
+      "y": 914
+    },
+    "scale": {
+      "x": 7289,
+      "y": 1132
+    },
+    "chart": {
+      "x": 7688,
+      "y": 1112,
+      "w": 310
+    },
+    "colored": {
+      "x": 7688,
+      "y": 400
+    },
+    "ghosted": {
+      "x": 8087,
+      "y": 881
+    }
+  },
+  "structure": {
+    "edges": [
+      {
+        "from": "inst.instances",
+        "to": "zrange.table"
+      },
+      {
+        "from": "measures.measures",
+        "to": "meshes.a"
+      },
+      {
+        "from": "zrange.table",
+        "to": "meshes.b"
+      },
+      {
+        "from": "meshes.table",
+        "to": "perElement.table"
+      },
+      {
+        "from": "perElement.table",
+        "to": "named.table"
+      },
+      {
+        "from": "named.table",
+        "to": "solid.table"
+      },
+      {
+        "from": "solid.table",
+        "to": "height.table"
+      },
+      {
+        "from": "height.table",
+        "to": "withStorey.a"
+      },
+      {
+        "from": "storeys.table",
+        "to": "withStorey.b"
+      },
+      {
+        "from": "withStorey.table",
+        "to": "rankInClass.table"
+      },
+      {
+        "from": "withStorey.table",
+        "to": "classSize.table"
+      },
+      {
+        "from": "rankInClass.table",
+        "to": "withSize.a"
+      },
+      {
+        "from": "classSize.table",
+        "to": "withSize.b"
+      },
+      {
+        "from": "withSize.table",
+        "to": "middle.table"
+      },
+      {
+        "from": "middle.table",
+        "to": "medians.table"
+      },
+      {
+        "from": "withSize.table",
+        "to": "withMedian.a"
+      },
+      {
+        "from": "medians.table",
+        "to": "withMedian.b"
+      },
+      {
+        "from": "withMedian.table",
+        "to": "ratio.table"
+      },
+      {
+        "from": "ratio.table",
+        "to": "fold.table"
+      },
+      {
+        "from": "fold.table",
+        "to": "flagged.table"
+      },
+      {
+        "from": "flagged.table",
+        "to": "scored.table"
+      },
+      {
+        "from": "scored.table",
+        "to": "ranked.table"
+      },
+      {
+        "from": "outliers.table",
+        "to": "scale.values"
+      },
+      {
+        "from": "outliers.table",
+        "to": "chart.table"
+      },
+      {
+        "from": "scale.legend",
+        "to": "chart.scale"
+      },
+      {
+        "from": "ranked.table",
+        "to": "outliers.table"
+      },
+      {
+        "from": "outliers.table",
+        "to": "answer.table"
+      },
+      {
+        "from": "inst.instances",
+        "to": "colored.instances"
+      },
+      {
+        "from": "outliers.table",
+        "to": "colored.values"
+      },
+      {
+        "from": "scale.legend",
+        "to": "colored.scale"
+      },
+      {
+        "from": "colored.instances",
+        "to": "ghosted.instances"
+      },
+      {
+        "from": "outliers.table",
+        "to": "ghosted.ids"
+      },
+      {
+        "from": "model.path",
+        "to": "inst.path"
+      },
+      {
+        "from": "model.path",
+        "to": "measures.path"
+      },
+      {
+        "from": "database.source",
+        "to": "storeys.path"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "about",
+        "kind": "view.note",
+        "version": 1
+      },
+      {
+        "id": "model",
+        "kind": "value.path",
+        "version": 1
+      },
+      {
+        "id": "database",
+        "kind": "duck.source",
+        "version": 1
+      },
+      {
+        "id": "inst",
+        "kind": "view3d.instances",
+        "version": 1
+      },
+      {
+        "id": "measures",
+        "kind": "view3d.measures",
+        "version": 1
+      },
+      {
+        "id": "storeys",
+        "kind": "duck.query",
+        "version": 1
+      },
+      {
+        "id": "zrange",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "meshes",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "perElement",
+        "kind": "table.aggregate",
+        "version": 1
+      },
+      {
+        "id": "named",
+        "kind": "table.rename",
+        "version": 1
+      },
+      {
+        "id": "solid",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "height",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "withStorey",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "rankInClass",
+        "kind": "table.window",
+        "version": 1
+      },
+      {
+        "id": "classSize",
+        "kind": "table.aggregate",
+        "version": 1
+      },
+      {
+        "id": "withSize",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "middle",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "medians",
+        "kind": "table.aggregate",
+        "version": 1
+      },
+      {
+        "id": "withMedian",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "ratio",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "fold",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "flagged",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "scored",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "ranked",
+        "kind": "table.sort",
+        "version": 1
+      },
+      {
+        "id": "scale",
+        "kind": "view.colormap",
+        "version": 1
+      },
+      {
+        "id": "chart",
+        "kind": "chart.bar",
+        "version": 1
+      },
+      {
+        "id": "outliers",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "answer",
+        "kind": "view.table",
+        "version": 1
+      },
+      {
+        "id": "colored",
+        "kind": "view3d.color",
+        "version": 1
+      },
+      {
+        "id": "ghosted",
+        "kind": "view3d.opacity",
+        "version": 1
+      }
+    ]
+  },
+  "values": {
+    "about": {
+      "text": "Model auditor: which elements are ten times larger or smaller than the median of their IFC class, and where are they? Volume is the enclosed mesh volume from view3d.measures, summed per element; Height is the element's vertical extent from its instance bounds. Storey is the nearest storey above an element in StoreyOfElement (smallest Depth), so each element sits on one storey. A class's median is the volume of its middle row by volume (table.window); Fold is how many times larger or smaller than that median an element is, never below 1. An element is an outlier when Fold is 10 or more in a class of at least 5 elements; spaces and openings are left out. The chart ranks the outliers by Fold on the scale the 3D view colours them with, and the 3D view ghosts everything else; the scatter in specs/viz-element-size-outliers.vl.json plots Volume on a log scale against Height. A large Fold is a question to ask of the model, not an error, and mesh volume is exact only for closed meshes."
+    },
+    "inst": {},
+    "storeys": {
+      "sql": "SELECT e.GlobalId, e.StepId, e.Name, s.Storey FROM EntityText e JOIN (SELECT EntityIndex, arg_min(StoreyName, Depth) AS Storey FROM StoreyOfElement GROUP BY EntityIndex) s ON s.EntityIndex = e.EntityIndex WHERE e.GlobalId IS NOT NULL"
+    },
+    "zrange": {
+      "columns": "instanceIndex,minZ,maxZ"
+    },
+    "meshes": {
+      "aKey": "instanceIndex",
+      "mode": "left"
+    },
+    "perElement": {
+      "groupBy": "globalId,category",
+      "aggregates": "sum(meshVolume) as Volume,min(minZ) as Bottom,max(maxZ) as Top,count(*) as Meshes"
+    },
+    "named": {
+      "renames": "globalId=GlobalId,category=Class"
+    },
+    "solid": {
+      "expr": "Volume > 0 and Class != \"IFCSPACE\" and Class != \"IFCOPENINGELEMENT\""
+    },
+    "height": {
+      "name": "Height",
+      "expr": "Top - Bottom"
+    },
+    "withStorey": {
+      "aKey": "GlobalId",
+      "mode": "left"
+    },
+    "rankInClass": {
+      "function": "rowNumber",
+      "partitionBy": "Class",
+      "orderBy": "Volume",
+      "name": "RankInClass"
+    },
+    "classSize": {
+      "groupBy": "Class",
+      "aggregates": "count(*) as ClassCount"
+    },
+    "withSize": {
+      "aKey": "Class",
+      "mode": "left"
+    },
+    "middle": {
+      "expr": "RankInClass == floor((ClassCount + 1) / 2)"
+    },
+    "medians": {
+      "groupBy": "Class",
+      "aggregates": "min(Volume) as ClassMedian"
+    },
+    "withMedian": {
+      "aKey": "Class",
+      "mode": "left"
+    },
+    "ratio": {
+      "name": "Ratio",
+      "expr": "Volume / ClassMedian"
+    },
+    "fold": {
+      "name": "Fold",
+      "expr": "max(Ratio, 1 / Ratio)"
+    },
+    "flagged": {
+      "name": "Outlier",
+      "expr": "Fold >= 10 and ClassCount >= 5"
+    },
+    "scored": {
+      "columns": "GlobalId,StepId,Name,Class,Storey,Volume,Height,ClassMedian,Ratio,Fold,Outlier"
+    },
+    "ranked": {
+      "A": "Fold",
+      "descendingA": "true",
+      "B": "GlobalId"
+    },
+    "scale": {
+      "valueColumn": "Fold",
+      "colorMap": "viridis"
+    },
+    "chart": {
+      "labelColumn": "Name",
+      "valueColumns": "Fold",
+      "title": "Outliers: how many times off their class median each element is (Fold)"
+    },
+    "outliers": {
+      "expr": "Outlier"
+    },
+    "colored": {
+      "joinColumn": "GlobalId",
+      "valueColumn": "Fold"
+    },
+    "ghosted": {
+      "joinColumn": "GlobalId",
+      "scope": "others",
+      "alpha": "0.12"
+    },
+    "measures": {},
+    "answer": {
+      "title": "Elements ten or more times off their class median (Volume m3, Height m)",
+      "columns": "Name,Class,Storey,Volume,Height,ClassMedian,Fold,StepId,GlobalId"
+    },
+    "model": {
+      "path": "{SAMPLES}/duplex-base.ifc"
+    },
+    "database": {
+      "path": "{SAMPLES}/duplex-base.duckdb"
+    }
+  }
+}

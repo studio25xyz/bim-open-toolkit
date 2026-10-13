@@ -4,7 +4,7 @@
 (`samples/analyses` and `samples/relations` from `deps/bim-open-flow`, `samples/nrc-analyses`,
 `samples/showcase-tables`,
 `samples/showcase-analyses`, `samples/bim-analyses`, `samples/view3d-analyses`,
-`samples/snowdon-analyses`) into both host profiles ("tables" and "bim"), through the
+`samples/snowdon-analyses`, `samples/viz-analyses`, `samples/checking-analyses`) into both host profiles ("tables" and "bim"), through the
 same `SampleSeeding` / `BimSampleSeeding` helpers and `HostComposition` registries
 `BimOpenFlow.Host.HostRunner` calls at start-up, and evaluates each one. A graph a
 profile's registry cannot validate is skipped here exactly as the host would skip it
@@ -77,6 +77,25 @@ SAMPLE_FLOWS_APPROVE=1 dotnet test tests/studio/BimOpenFlow.SampleFlows.Tests
 
 Every case rewrites its `golden/<profile>/<id>.txt` and passes. Review the diff before
 committing, the same as any other generated file.
+
+## When a running host locks the Duplex files
+
+The fixture rebuilds `samples/nrc/duplex-*.duckdb` and `duplex-enriched.bos` before any
+test runs. A studio host started from `.claude/launch.json` with the `bim` profile holds
+the `.duckdb` files open, so every test then fails with `UnauthorizedAccessException`
+and a `.duckdb.part` file is left behind. Do not stop another session's host. Run the
+tests in a copy of the tracked files with `deps/` linked in:
+
+```bash
+git archive HEAD | tar -x -C /c/w1 && cmd //c mklink //J "C:\w1\deps" "<checkout>\deps"
+cd /c/w1 && SAMPLE_FLOWS_APPROVE=1 dotnet test tests/studio/BimOpenFlow.SampleFlows.Tests -c Release --artifacts-path C:/w1/a
+```
+
+Copy the approved goldens back by path. Use a short folder such as `C:\w1`: a long path
+makes `BimOpenFlow.Host`'s content copies exceed MAX_PATH (MSB3021). The copy holds
+HEAD's goldens and catalog with the live `deps/`, so a mismatch there can be another
+session's uncommitted pin follow-through; re-run that one test in the real checkout
+before treating it as a defect. The stale-file cause behind TKT-291 is in that ticket.
 
 ## Adding an allow-list entry
 

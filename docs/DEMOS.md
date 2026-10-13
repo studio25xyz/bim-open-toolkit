@@ -10,6 +10,21 @@ opens its port in well under a second and prepares slow generated samples
 "not ready yet" for a few seconds and then turns green on its own. Every page
 shows a banner whenever the host is unreachable.
 
+## Demos by context
+
+The demos are grouped by who they are for (`docs/proposals/demo-contexts.md`).
+Each row names the page that exists today and the ticket that moves it onto a
+public building; every context also runs the same graphs through Claude over
+the MCP servers.
+
+| Context | Who | Today | Ticket |
+|---|---|---|---|
+| Analysis | an analyst with a question | `/duckdb.html` and `samples/duckdb-analyses`, over the private Snowdon export | TKT-165 |
+| 3D | a coordinator reviewing a model | `/3d.html` over `samples/view3d-analyses` (Duplex IFC); `/showcase.html` over a Snowdon fixture | TKT-166 |
+| Checking | a manager auditing a delivery | `nrc-analyses/nrc-dc-w1-verdicts`: IFC to verdicts, 3D, chart, pending report | TKT-167 |
+| Pipelines | an engineer feeding other systems | readers in `samples/showcase-analyses`; writers wait on Run (TKT-12) | TKT-168 |
+| Research | a researcher reproducing a result | `/nrc.html` and `npm run nrc:walkthrough` | TKT-169 |
+
 ## Start a host and the editor
 
 | Profile | Host | Editor | Packs |
@@ -34,16 +49,31 @@ dotnet run --project src/studio/BimOpenFlow.Studio -- --port 5214 --profile bim 
 npm run web --prefix bimopenflow/web   # the studio pages (packages/studio-web) on 5300
 ```
 
+To run bim-open-flow's generic host and editor from this checkout (for example to
+screenshot its `samples/buildings` graphs), start `flow-host` (port 5214) and
+`bof-editor-generic` (port 5304). `flow-host` runs `npm run host` in
+`deps/bim-open-flow/bimopenflow/web`, whose `dotnet run` makes the host's working
+directory the project folder, so its store is
+`deps/bim-open-flow/src/artifacts/flow/store`. That host seeds only
+`samples/analyses`; to open a building graph, replace `{PUBLIC}` in the document
+with the absolute path of `deps/bim-open-data/samples/public`, write it into that
+store with `scripts/seed-store.mjs`'s `seedFlows`, and open `/?analysis=<id>`
+(choosing it in the picker alone leaves the start page open). A bar chart is at
+least 480 px wide and the result column starts at 420 px, so widen the column
+(the editor keeps the width in `localStorage` under `bof-app-right-width`)
+before a capture.
+
 The editor proxies `/api` to the host named by `BOF_HOST` (default
 `http://127.0.0.1:5214`). An empty store is seeded with every sample graph the
 profile can run; graphs the profile lacks nodes for are skipped and named in the
 host log. `start-bim-flow.mjs` runs `bimopenflow-studio` (BimOpenFlow.Host plus
 `POST /api/ask`), so both pages below get the Ask box from one binary; there is
-no separate ask-only host to start. Pages: `/` (editor with table, chart, 3D,
-and verdict panes, and the Ask panel described below), `/studio.html` (the
-same editor in the studio look, a prototype kept beside the classic one:
+no separate ask-only host to start. Pages: `/` (the editor in the studio look, the default since 2026-10-12,
+with table, chart, 3D, and verdict panes and the Ask panel described below:
 flow titles, a Run button, a floating canvas toolbar with Fit and Tidy, an
-empty-flow card, and pack-coloured node stripes; `docs/proposals/studio-look.md`),
+empty-flow card, node borders coloured by pack role with a key under the "?"
+button; `docs/proposals/studio-look.md`), `/classic.html` (the earlier look,
+kept for comparison),
 `/3d.html?analysis=<id>` (3D-first layout, where picking an element lists its
 property sets under the status line), `/duckdb.html` (DuckDB demo with a
 flow picker and an Ask box), `/showcase.html` (button-driven 3D recipes).
@@ -74,15 +104,16 @@ in the transcript instead of failing.
 
 | Folder | Input | Profile | You see | Guarded by |
 |---|---|---|---|---|
-| `samples/showcase-analyses` | CSV, BOS, IFC-derived DuckDB, IFC, BFAST | both / bim | the whole chain: relations into verdicts, a coloured 3D view, a chart, an HTML report; the buffer directory of a BFAST file | `NrcWorkflows.Tests/ShowcaseGraphTests`, `BfastGraphTests` |
-| `samples/nrc-analyses` | CSV and the Duplex DuckDB | both (two graphs bim only) | the NRC paper's eight answers, DC-W1 doors coloured in 3D, property sets written back to an IFC | `NrcWorkflows.Tests` |
+| `samples/showcase-analyses` | CSV, BOS | csv-to-chart in both, bos-to-relations in bim | two bar charts: operational carbon per category from a CSV (`csv-to-chart`), Duplex entities per IFC category from the BOS (`bos-to-relations`). The IFC-to-verdicts chain with 3D and an HTML report is `nrc-analyses/nrc-dc-w1-verdicts`; the BFAST buffers are in `samples/showcase-tables` | `NrcWorkflows.Tests/ShowcaseGraphTests` |
+| `samples/nrc-analyses` | CSV and the Duplex DuckDB | both (four graphs bim only: `nrc-dc-w1-verdicts`, `nrc-enrich-run`, `nrc-color-operational-carbon`, `nrc-join-analytics`) | the NRC paper's eight answers, DC-W1 doors coloured in 3D, property sets written back to an IFC | `NrcWorkflows.Tests` |
 | `samples/analyses` (in `deps/bim-open-flow`) | CSV, XLSX, SQLite, DuckDB | tables | table panes over bim-open-flow's `samples/tables` | bim-open-flow's `TableWorkflows.Tests/SampleAnalysesTests` |
 | `samples/relations` (in `deps/bim-open-flow`) | CSV, DuckDB | tables | the `rel.*` pack: lazy plans, one SQL statement per chain | bim-open-flow's `Nodes.Relations.Tests/SampleGraphTests` |
 | `samples/showcase-tables` | BFAST | tables, bim | the buffers of bim-open-flow's `samples/tables/sample.bfast` | `NrcWorkflows.Tests/BfastGraphTests` |
 | `samples/duckdb-analyses` | DuckDB (Snowdon, prepared by `npm run duckdb:prepare`) | tables, `/duckdb.html` | nine query workflows over a building database | `SnowdonWorkflows.Tests/DuckDbWorkflowCatalogTests` |
 | `samples/bim-analyses` | BOS (`samples/bim/sample.bos`, generated) | bim | the `bim.*` analyses: disciplines, levels, rooms, containment, nearest door | `BimWorkflows.Tests` |
+| `samples/checking-analyses` | IDS files under `samples/nrc/ids`, the Duplex BOS and IFC, a committed BCF under `samples/nrc/bcf` | bim | the `ids.*` and `bcf.*` packs: an IDS evaluated to verdicts, a chart and a coloured model; a BCF written from IDS failures and from a SQL result (pending until Run); a BCF read back and coloured | `NrcWorkflows.Tests/CheckingGraphTests` |
 | `samples/view3d-analyses` | IFC (the committed `samples/nrc/duplex-base.ifc`) | bim, `/3d.html` | colour by category, ghost context, exploded categories, massing boxes, voxels, decimation | `View3dWorkflows.Tests` |
-| `samples/snowdon-analyses` | BOS (local Snowdon model, never committed) | bim, when present | the 3D recipe nodes over a real building | `View3dWorkflows.Tests` |
+| `samples/snowdon-analyses` | BOS (local Snowdon model, never committed); the union DuckDB and `federation-confirmations.csv` for the federation graph | bim, when present | `snowdon-toolkit`: the 3D recipe nodes over a real building; `federation-match`: a storey rule and confirmed matches joined into a correspondence table, written to Parquet on Run | `View3dWorkflows.Tests`, `SnowdonWorkflows.Tests/SnowdonFederationGraphTests` |
 
 Each folder's README lists its graphs and the numbers they produce.
 

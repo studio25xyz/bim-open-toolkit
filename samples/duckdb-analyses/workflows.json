@@ -1,5 +1,658 @@
 [
   {
+    "id": "public-door-schedule",
+    "title": "Door schedule (Schependomlaan)",
+    "tag": "JOIN + PROJECT",
+    "database": "public",
+    "description": "Join every door to the storey that contains it, keep the schedule fields, and sort by storey then mark. Width_mm is the IFC OverallWidth attribute; it stays NULL where the Archicad export carries no width, and WidthStatus says so.",
+    "result": "answer",
+    "graph": {
+      "formatVersion": "0.1.0",
+      "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{PUBLIC_DUCKDB}",
+            "description": "The building's BIM Open Schema DuckDB file; any public sample building works here."
+          }
+        ],
+        "nodes": [
+          {
+            "id": "answer",
+            "kind": "table.sort",
+            "version": 1
+          },
+          {
+            "id": "doors",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "storeys",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "attach-storey",
+            "kind": "table.join",
+            "version": 1
+          },
+          {
+            "id": "schedule-fields",
+            "kind": "table.project",
+            "version": 1
+          },
+          {
+            "id": "database",
+            "kind": "duck.source",
+            "version": 1
+          },
+          {
+            "id": "width-status",
+            "kind": "table.derive",
+            "version": 1
+          }
+        ],
+        "edges": [
+          {
+            "from": "doors.table",
+            "to": "attach-storey.a"
+          },
+          {
+            "from": "storeys.table",
+            "to": "attach-storey.b"
+          },
+          {
+            "from": "width-status.table",
+            "to": "schedule-fields.table"
+          },
+          {
+            "from": "schedule-fields.table",
+            "to": "answer.table"
+          },
+          {
+            "from": "database.source",
+            "to": "doors.path"
+          },
+          {
+            "from": "database.source",
+            "to": "storeys.path"
+          },
+          {
+            "from": "attach-storey.table",
+            "to": "width-status.table"
+          }
+        ]
+      },
+      "values": {
+        "doors": {
+          "sql": "SELECT e.EntityIndex AS Door, e.Name AS Mark, e.Type AS DoorType, TRY_CAST(w.Value AS DOUBLE) AS Width_mm FROM EntityText e LEFT JOIN ParameterText w ON w.EntityIndex = e.EntityIndex AND w.Name = 'Ifc:OverallWidth' WHERE e.Category = 'IFCDOOR'"
+        },
+        "storeys": {
+          "sql": "SELECT EntityIndex AS Door, StoreyName AS Storey FROM StoreyOfElement WHERE Depth = 1"
+        },
+        "attach-storey": {
+          "aKey": "Door",
+          "bKey": "Door",
+          "mode": "left"
+        },
+        "schedule-fields": {
+          "columns": "Mark, DoorType, Storey, Width_mm, WidthStatus"
+        },
+        "answer": {
+          "A": "Storey",
+          "descendingA": "false",
+          "B": "Mark",
+          "descendingB": "false"
+        },
+        "database": {
+          "path": "$model"
+        },
+        "width-status": {
+          "name": "WidthStatus",
+          "expr": "isnull(Width_mm) ? 'No OverallWidth in the file' : 'Known'"
+        }
+      },
+      "layout": {
+        "answer": {
+          "x": 1570,
+          "y": 30
+        },
+        "doors": {
+          "x": 330,
+          "y": 30
+        },
+        "storeys": {
+          "x": 330,
+          "y": 265
+        },
+        "attach-storey": {
+          "x": 640,
+          "y": 30
+        },
+        "schedule-fields": {
+          "x": 1260,
+          "y": 30
+        },
+        "database": {
+          "x": 20,
+          "y": 30
+        },
+        "width-status": {
+          "x": 950,
+          "y": 30
+        }
+      }
+    }
+  },
+  {
+    "id": "public-door-types",
+    "title": "Most-used door types (Schependomlaan)",
+    "tag": "AGGREGATE + LIMIT",
+    "database": "public",
+    "description": "Count doors by their IFC type name, rank the types, and take the top ten. Change count on the final node to see the whole list.",
+    "result": "answer",
+    "graph": {
+      "formatVersion": "0.1.0",
+      "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{PUBLIC_DUCKDB}",
+            "description": "The building's BIM Open Schema DuckDB file; any public sample building works here."
+          }
+        ],
+        "nodes": [
+          {
+            "id": "answer",
+            "kind": "table.limit",
+            "version": 1
+          },
+          {
+            "id": "doors",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "count-types",
+            "kind": "table.aggregate",
+            "version": 1
+          },
+          {
+            "id": "rank-types",
+            "kind": "table.sort",
+            "version": 1
+          },
+          {
+            "id": "database",
+            "kind": "duck.source",
+            "version": 1
+          }
+        ],
+        "edges": [
+          {
+            "from": "doors.table",
+            "to": "count-types.table"
+          },
+          {
+            "from": "count-types.table",
+            "to": "rank-types.table"
+          },
+          {
+            "from": "rank-types.table",
+            "to": "answer.table"
+          },
+          {
+            "from": "database.source",
+            "to": "doors.path"
+          }
+        ]
+      },
+      "values": {
+        "doors": {
+          "sql": "SELECT Type AS DoorType FROM EntityText WHERE Category = 'IFCDOOR'"
+        },
+        "count-types": {
+          "groupBy": "DoorType",
+          "aggregates": "count(*) as Doors"
+        },
+        "rank-types": {
+          "A": "Doors",
+          "descendingA": "true",
+          "B": "DoorType",
+          "descendingB": "false"
+        },
+        "answer": {
+          "count": "10",
+          "offset": "0"
+        },
+        "database": {
+          "path": "$model"
+        }
+      },
+      "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
+        "doors": {
+          "x": 330,
+          "y": 30
+        },
+        "count-types": {
+          "x": 640,
+          "y": 30
+        },
+        "rank-types": {
+          "x": 950,
+          "y": 30
+        },
+        "database": {
+          "x": 20,
+          "y": 30
+        }
+      }
+    }
+  },
+  {
+    "id": "public-rooms-per-storey",
+    "title": "Rooms per storey (Schependomlaan)",
+    "tag": "AGGREGATE + CHART",
+    "database": "public",
+    "description": "Count the spaces each storey contains and plot them. The storey comes from the StoreyOfElement view, so a space is counted once, under the storey that contains it.",
+    "result": "answer",
+    "graph": {
+      "formatVersion": "0.1.0",
+      "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{PUBLIC_DUCKDB}",
+            "description": "The building's BIM Open Schema DuckDB file; any public sample building works here."
+          }
+        ],
+        "nodes": [
+          {
+            "id": "answer",
+            "kind": "table.sort",
+            "version": 1
+          },
+          {
+            "id": "rooms",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "count-rooms",
+            "kind": "table.aggregate",
+            "version": 1
+          },
+          {
+            "id": "chart",
+            "kind": "chart.bar",
+            "version": 1
+          },
+          {
+            "id": "database",
+            "kind": "duck.source",
+            "version": 1
+          }
+        ],
+        "edges": [
+          {
+            "from": "rooms.table",
+            "to": "count-rooms.table"
+          },
+          {
+            "from": "count-rooms.table",
+            "to": "answer.table"
+          },
+          {
+            "from": "answer.table",
+            "to": "chart.table"
+          },
+          {
+            "from": "database.source",
+            "to": "rooms.path"
+          }
+        ]
+      },
+      "values": {
+        "rooms": {
+          "sql": "SELECT s.StoreyName AS Storey FROM EntityText e JOIN StoreyOfElement s ON s.EntityIndex = e.EntityIndex AND s.Depth = 1 WHERE e.Category = 'IFCSPACE'"
+        },
+        "count-rooms": {
+          "groupBy": "Storey",
+          "aggregates": "count(*) as Rooms"
+        },
+        "answer": {
+          "A": "Storey",
+          "descendingA": "false"
+        },
+        "chart": {
+          "labelColumn": "Storey",
+          "valueColumns": "Rooms",
+          "title": "Rooms per storey",
+          "sort": "none"
+        },
+        "database": {
+          "path": "$model"
+        }
+      },
+      "layout": {
+        "answer": {
+          "x": 950,
+          "y": 30
+        },
+        "rooms": {
+          "x": 330,
+          "y": 30
+        },
+        "count-rooms": {
+          "x": 640,
+          "y": 30
+        },
+        "chart": {
+          "x": 1260,
+          "y": 30
+        },
+        "database": {
+          "x": 20,
+          "y": 30
+        }
+      }
+    }
+  },
+  {
+    "id": "public-missing-widths",
+    "title": "Doors without a width (Schependomlaan)",
+    "tag": "FILTER + EXPLAIN",
+    "database": "public",
+    "description": "Keep only the doors whose IFC OverallWidth is absent. The export writes a width for 104 of the 205 doors; the other 101 have none anywhere in the file, and the graph leaves them NULL rather than guessing from the type name.",
+    "result": "answer",
+    "graph": {
+      "formatVersion": "0.1.0",
+      "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{PUBLIC_DUCKDB}",
+            "description": "The building's BIM Open Schema DuckDB file; any public sample building works here."
+          }
+        ],
+        "nodes": [
+          {
+            "id": "answer",
+            "kind": "table.project",
+            "version": 1
+          },
+          {
+            "id": "door-facts",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "missing-only",
+            "kind": "table.filter",
+            "version": 1
+          },
+          {
+            "id": "database",
+            "kind": "duck.source",
+            "version": 1
+          }
+        ],
+        "edges": [
+          {
+            "from": "door-facts.table",
+            "to": "missing-only.table"
+          },
+          {
+            "from": "missing-only.table",
+            "to": "answer.table"
+          },
+          {
+            "from": "database.source",
+            "to": "door-facts.path"
+          }
+        ]
+      },
+      "values": {
+        "door-facts": {
+          "sql": "SELECT e.Name AS Mark, e.Type AS DoorType, TRY_CAST(w.Value AS DOUBLE) AS Width_mm FROM EntityText e LEFT JOIN ParameterText w ON w.EntityIndex = e.EntityIndex AND w.Name = 'Ifc:OverallWidth' WHERE e.Category = 'IFCDOOR'"
+        },
+        "missing-only": {
+          "expr": "isnull(Width_mm)"
+        },
+        "answer": {
+          "columns": "Mark, DoorType, Width_mm"
+        },
+        "database": {
+          "path": "$model"
+        }
+      },
+      "layout": {
+        "answer": {
+          "x": 950,
+          "y": 30
+        },
+        "door-facts": {
+          "x": 330,
+          "y": 30
+        },
+        "missing-only": {
+          "x": 640,
+          "y": 30
+        },
+        "database": {
+          "x": 20,
+          "y": 30
+        }
+      }
+    }
+  },
+  {
+    "id": "public-floor-area-by-use",
+    "title": "Floor area by room use (Schependomlaan)",
+    "tag": "JOIN + AGGREGATE + CHART",
+    "database": "public",
+    "description": "Join each space to its NetFloorArea base quantity, total the area per space use, and plot it. Habitable rooms (Verblijfsruimte) hold 705.8 m2 of the 965.8 m2 net floor area; a note on the canvas translates the six Dutch use names.",
+    "result": "answer",
+    "graph": {
+      "formatVersion": "0.1.0",
+      "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{PUBLIC_DUCKDB}",
+            "description": "The building's BIM Open Schema DuckDB file; any public sample building works here."
+          }
+        ],
+        "nodes": [
+          {
+            "id": "spaces",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "areas",
+            "kind": "duck.query",
+            "version": 1
+          },
+          {
+            "id": "attach-area",
+            "kind": "table.join",
+            "version": 1
+          },
+          {
+            "id": "total-by-use",
+            "kind": "table.aggregate",
+            "version": 1
+          },
+          {
+            "id": "chart",
+            "kind": "chart.bar",
+            "version": 1
+          },
+          {
+            "id": "database",
+            "kind": "duck.source",
+            "version": 1
+          },
+          {
+            "id": "round-area",
+            "kind": "table.derive",
+            "version": 1
+          },
+          {
+            "id": "use-fields",
+            "kind": "table.project",
+            "version": 1
+          },
+          {
+            "id": "answer",
+            "kind": "table.sort",
+            "version": 1
+          },
+          {
+            "id": "glossary",
+            "kind": "view.note",
+            "version": 1
+          }
+        ],
+        "edges": [
+          {
+            "from": "spaces.table",
+            "to": "attach-area.a"
+          },
+          {
+            "from": "areas.table",
+            "to": "attach-area.b"
+          },
+          {
+            "from": "attach-area.table",
+            "to": "total-by-use.table"
+          },
+          {
+            "from": "answer.table",
+            "to": "chart.table"
+          },
+          {
+            "from": "database.source",
+            "to": "spaces.path"
+          },
+          {
+            "from": "database.source",
+            "to": "areas.path"
+          },
+          {
+            "from": "total-by-use.table",
+            "to": "round-area.table"
+          },
+          {
+            "from": "round-area.table",
+            "to": "use-fields.table"
+          },
+          {
+            "from": "use-fields.table",
+            "to": "answer.table"
+          }
+        ]
+      },
+      "values": {
+        "spaces": {
+          "sql": "SELECT EntityIndex AS Space, Type AS Use FROM EntityText WHERE Category = 'IFCSPACE'"
+        },
+        "areas": {
+          "sql": "SELECT EntityIndex AS Space, TRY_CAST(Value AS DOUBLE) AS NetFloorArea_m2 FROM ParameterText WHERE Name = 'NetFloorArea' AND ParameterGroup = 'BaseQuantities'"
+        },
+        "attach-area": {
+          "aKey": "Space",
+          "bKey": "Space",
+          "mode": "left"
+        },
+        "total-by-use": {
+          "groupBy": "Use",
+          "aggregates": "count(*) as Spaces, sum(NetFloorArea_m2) as TotalArea_m2"
+        },
+        "chart": {
+          "labelColumn": "Use",
+          "valueColumns": "NetFloorArea_m2",
+          "title": "Net floor area by room use (m2)",
+          "sort": "none"
+        },
+        "database": {
+          "path": "$model"
+        },
+        "round-area": {
+          "name": "NetFloorArea_m2",
+          "expr": "round(TotalArea_m2, 1)"
+        },
+        "use-fields": {
+          "columns": "Use, Spaces, NetFloorArea_m2"
+        },
+        "answer": {
+          "A": "NetFloorArea_m2",
+          "descendingA": "true",
+          "B": "Use",
+          "descendingB": "false"
+        },
+        "glossary": {
+          "text": "Use is the space type the Archicad export names in Dutch, after the room classes of the Dutch building code: Verblijfsruimte, habitable room (living room, bedroom, kitchen); Verkeersruimte, circulation (hall, landing, stair); Badruimte, bathroom; Technische ruimte, plant or meter room; Toiletruimte, toilet; Onbenoemde ruimte, unclassified space (storage, attic)."
+        }
+      },
+      "layout": {
+        "spaces": {
+          "x": 330,
+          "y": 30
+        },
+        "areas": {
+          "x": 330,
+          "y": 265
+        },
+        "attach-area": {
+          "x": 640,
+          "y": 30
+        },
+        "total-by-use": {
+          "x": 950,
+          "y": 30
+        },
+        "chart": {
+          "x": 2190,
+          "y": 30
+        },
+        "database": {
+          "x": 20,
+          "y": 30
+        },
+        "round-area": {
+          "x": 1260,
+          "y": 30
+        },
+        "use-fields": {
+          "x": 1570,
+          "y": 30
+        },
+        "answer": {
+          "x": 1880,
+          "y": 30
+        },
+        "glossary": {
+          "x": 640,
+          "y": 265,
+          "w": 560,
+          "h": 160
+        }
+      }
+    }
+  },
+  {
     "id": "duckdb-door-schedule",
     "title": "Door schedule",
     "tag": "JOIN + PROJECT",
@@ -8,6 +661,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -59,11 +720,11 @@
           },
           {
             "from": "database.source",
-            "to": "doors.source"
+            "to": "doors.path"
           },
           {
             "from": "database.source",
-            "to": "levels.source"
+            "to": "levels.path"
           }
         ]
       },
@@ -89,32 +750,37 @@
           "descendingB": "false"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "doors": {
-          "x": 20,
-          "y": 20
+          "x": 330,
+          "y": 30
         },
         "levels": {
           "x": 330,
-          "y": 20
+          "y": 265
         },
         "attach-level": {
-          "x": 170,
-          "y": 245
+          "x": 640,
+          "y": 30
         },
         "schedule-fields": {
-          "x": 20,
-          "y": 480
+          "x": 950,
+          "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 480
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-door-types",
@@ -125,6 +791,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -167,7 +841,7 @@
           },
           {
             "from": "database.source",
-            "to": "doors.source"
+            "to": "doors.path"
           }
         ]
       },
@@ -190,28 +864,33 @@
           "offset": "0"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "doors": {
-          "x": 20,
+          "x": 330,
           "y": 30
         },
         "count-types": {
-          "x": 330,
+          "x": 640,
           "y": 30
         },
         "rank-types": {
-          "x": 330,
-          "y": 265
+          "x": 950,
+          "y": 30
         },
-        "answer": {
+        "database": {
           "x": 20,
-          "y": 265
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-room-schedule",
@@ -222,6 +901,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -273,11 +960,11 @@
           },
           {
             "from": "database.source",
-            "to": "rooms.source"
+            "to": "rooms.path"
           },
           {
             "from": "database.source",
-            "to": "levels.source"
+            "to": "levels.path"
           }
         ]
       },
@@ -303,42 +990,55 @@
           "descendingB": "false"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "rooms": {
-          "x": 20,
-          "y": 20
+          "x": 330,
+          "y": 30
         },
         "levels": {
           "x": 330,
-          "y": 20
+          "y": 265
         },
         "attach-level": {
-          "x": 170,
-          "y": 245
+          "x": 640,
+          "y": 30
         },
         "room-fields": {
-          "x": 20,
-          "y": 480
+          "x": 950,
+          "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 480
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-room-distribution",
     "title": "Rooms by storey",
-    "tag": "BRANCH + AGGREGATE",
-    "description": "Count rooms by their typed storey reference and join the counts to readable level names; the chart node plots the 33 storeys that have rooms, numbering storeys that share a name. This counts mapped records; it does not certify spatial completeness.",
+    "tag": "AGGREGATE + CHART",
+    "description": "Count rooms by their typed storey reference, join the counts to readable level names, and plot them: one row and one bar per storey, numbering storeys that share a name, plus a row for rooms with no storey reference. This counts mapped records; it does not certify spatial completeness.",
     "result": "answer",
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -371,13 +1071,13 @@
             "version": 1
           },
           {
-            "id": "chart-rows",
-            "kind": "sql.query",
+            "id": "chart",
+            "kind": "chart.bar",
             "version": 1
           },
           {
-            "id": "chart",
-            "kind": "chart.bar",
+            "id": "storey-names",
+            "kind": "view.note",
             "version": 1
           }
         ],
@@ -400,18 +1100,14 @@
           },
           {
             "from": "database.source",
-            "to": "rooms.source"
+            "to": "rooms.path"
           },
           {
             "from": "database.source",
-            "to": "levels.source"
+            "to": "levels.path"
           },
           {
-            "from": "attach-level.table",
-            "to": "chart-rows.t1"
-          },
-          {
-            "from": "chart-rows.table",
+            "from": "answer.table",
             "to": "chart.table"
           }
         ]
@@ -433,52 +1129,59 @@
           "mode": "left"
         },
         "answer": {
-          "sql": "SELECT Storey, Rooms FROM t ORDER BY Rooms DESC, Storey"
+          "sql": "SELECT CASE WHEN StoreyKey IS NULL THEN '(no storey reference)' WHEN Storey IS NULL THEN CAST(StoreyKey AS VARCHAR) WHEN count(*) OVER (PARTITION BY Storey) > 1 THEN Storey || ' · ' || row_number() OVER (PARTITION BY Storey ORDER BY StoreyKey) ELSE Storey END AS Level, Rooms FROM t ORDER BY StoreyKey IS NULL, Level"
         },
         "database": {
-          "path": "{DUCKDB}"
-        },
-        "chart-rows": {
-          "sql": "SELECT CASE WHEN count(*) OVER (PARTITION BY Storey) > 1 THEN Storey || ' · ' || row_number() OVER (PARTITION BY Storey ORDER BY StoreyKey) ELSE Storey END AS Level, Rooms FROM t WHERE StoreyKey IS NOT NULL ORDER BY Level"
+          "path": "$model"
         },
         "chart": {
           "labelColumn": "Level",
           "valueColumns": "Rooms",
           "title": "Rooms per storey",
           "sort": "none"
+        },
+        "storey-names": {
+          "text": "Several Snowdon storeys share a name: each source document defines its own levels, so one level name can appear once per document. The answer numbers them in storey-id order (Level 1 · 1, Level 1 · 2) so each storey keeps its own row and bar. Rooms with no storey reference are counted on the last row, (no storey reference), so the counts sum to every room."
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "rooms": {
-          "x": 20,
-          "y": 20
+          "x": 330,
+          "y": 30
         },
         "levels": {
           "x": 330,
-          "y": 20
+          "y": 265
         },
         "count-rooms": {
-          "x": 20,
-          "y": 240
+          "x": 640,
+          "y": 30
         },
         "attach-level": {
-          "x": 330,
-          "y": 260
+          "x": 950,
+          "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 480
-        },
-        "chart-rows": {
-          "x": 640,
-          "y": 480
+        "database": {
+          "x": 20,
+          "y": 30
         },
         "chart": {
+          "x": 1570,
+          "y": 30
+        },
+        "storey-names": {
           "x": 640,
-          "y": 700
+          "y": 265,
+          "w": 560,
+          "h": 140
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-missing-widths",
@@ -489,6 +1192,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -522,39 +1233,44 @@
           },
           {
             "from": "database.source",
-            "to": "door-facts.source"
+            "to": "door-facts.path"
           }
         ]
       },
       "values": {
         "door-facts": {
-          "sql": "SELECT element_mark AS Mark, element_name AS DoorType, nominal_width AS Width_m, CASE WHEN nominal_width IS NULL THEN 1 ELSE 0 END AS MissingWidth, nominal_width_reason AS Reason, nominal_width_explanation AS Explanation FROM door"
+          "sql": "SELECT element_mark AS Mark, element_name AS DoorType, nominal_width AS Width_m, nominal_width_reason AS Reason, nominal_width_explanation AS Explanation FROM door"
         },
         "missing-only": {
-          "expr": "MissingWidth > 0"
+          "expr": "isnull(Width_m)"
         },
         "answer": {
           "columns": "Mark, DoorType, Width_m, Reason, Explanation"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 950,
+          "y": 30
+        },
         "door-facts": {
-          "x": 20,
+          "x": 330,
           "y": 30
         },
         "missing-only": {
-          "x": 330,
+          "x": 640,
           "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 265
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-roof-coverage",
@@ -565,6 +1281,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -598,7 +1322,7 @@
           },
           {
             "from": "database.source",
-            "to": "roof-facts.source"
+            "to": "roof-facts.path"
           }
         ]
       },
@@ -615,24 +1339,29 @@
           "descendingA": "true"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 950,
+          "y": 30
+        },
         "roof-facts": {
-          "x": 20,
+          "x": 330,
           "y": 30
         },
         "coverage": {
-          "x": 330,
+          "x": 640,
           "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 265
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-evidence-trace",
@@ -643,6 +1372,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -694,11 +1431,11 @@
           },
           {
             "from": "database.source",
-            "to": "width-evidence.source"
+            "to": "width-evidence.path"
           },
           {
             "from": "database.source",
-            "to": "evidence.source"
+            "to": "evidence.path"
           }
         ]
       },
@@ -724,32 +1461,37 @@
           "descendingB": "false"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "width-evidence": {
-          "x": 20,
-          "y": 20
+          "x": 330,
+          "y": 30
         },
         "evidence": {
           "x": 330,
-          "y": 20
+          "y": 265
         },
         "resolve-evidence": {
-          "x": 170,
-          "y": 245
+          "x": 640,
+          "y": 30
         },
         "trace-fields": {
-          "x": 20,
-          "y": 480
+          "x": 950,
+          "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 480
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-source-lineage",
@@ -760,6 +1502,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "A typed building-model DuckDB export (export-duckdb in bim-open-data's building-model-workflows), by default the Snowdon export."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -811,11 +1561,11 @@
           },
           {
             "from": "database.source",
-            "to": "source-objects.source"
+            "to": "source-objects.path"
           },
           {
             "from": "database.source",
-            "to": "deliveries.source"
+            "to": "deliveries.path"
           }
         ]
       },
@@ -840,32 +1590,37 @@
           "descendingA": "true"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "source-objects": {
-          "x": 20,
-          "y": 20
+          "x": 330,
+          "y": 30
         },
         "deliveries": {
           "x": 330,
-          "y": 20
+          "y": 265
         },
         "attach-delivery": {
-          "x": 170,
-          "y": 245
+          "x": 640,
+          "y": 30
         },
         "count-sources": {
-          "x": 20,
-          "y": 480
+          "x": 950,
+          "y": 30
         },
-        "answer": {
-          "x": 330,
-          "y": 480
+        "database": {
+          "x": 20,
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   },
   {
     "id": "duckdb-typed-schema",
@@ -876,6 +1631,14 @@
     "graph": {
       "formatVersion": "0.1.0",
       "structure": {
+        "inputs": [
+          {
+            "name": "model",
+            "kind": "FilePath",
+            "default": "{DUCKDB}",
+            "description": "Any DuckDB file; the graph reads only its information_schema."
+          }
+        ],
         "nodes": [
           {
             "id": "answer",
@@ -918,16 +1681,16 @@
           },
           {
             "from": "database.source",
-            "to": "column-catalog.source"
+            "to": "column-catalog.path"
           }
         ]
       },
       "values": {
         "column-catalog": {
-          "sql": "SELECT table_name AS TableName, column_name AS ColumnName, data_type AS SqlType, CASE WHEN data_type IN ('DOUBLE', 'INTEGER', 'BIGINT', 'DECIMAL(38,10)') THEN 1 ELSE 0 END AS IsNumeric FROM information_schema.columns WHERE table_schema = 'main'"
+          "sql": "SELECT table_name AS TableName, column_name AS ColumnName, data_type AS SqlType FROM information_schema.columns WHERE table_schema = 'main'"
         },
         "numeric-only": {
-          "expr": "IsNumeric > 0"
+          "expr": "SqlType in ('DOUBLE', 'INTEGER', 'BIGINT', 'DECIMAL(38,10)')"
         },
         "count-columns": {
           "groupBy": "TableName, SqlType",
@@ -940,27 +1703,32 @@
           "descendingB": "false"
         },
         "database": {
-          "path": "{DUCKDB}"
+          "path": "$model"
         }
       },
       "layout": {
+        "answer": {
+          "x": 1260,
+          "y": 30
+        },
         "column-catalog": {
-          "x": 20,
+          "x": 330,
           "y": 30
         },
         "numeric-only": {
-          "x": 330,
+          "x": 640,
           "y": 30
         },
         "count-columns": {
-          "x": 330,
-          "y": 265
+          "x": 950,
+          "y": 30
         },
-        "answer": {
+        "database": {
           "x": 20,
-          "y": 265
+          "y": 30
         }
       }
-    }
+    },
+    "database": "snowdon"
   }
 ]

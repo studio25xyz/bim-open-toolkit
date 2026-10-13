@@ -14,10 +14,18 @@ public sealed class BimElementsNode : IFlowNode
         Kind, 1, NodeCapability.Pure,
         Inputs: [],
         Outputs: [new PortSpec("table", PortType.Table)],
-        Params: [new ParamSpec("path", ParamKind.FilePath)],
+        Params: [new ParamSpec("path", ParamKind.FilePath, Bindable: PortType.Text, Suggest: SuggestSource.FilesWith(".bos"))],
         "Loads a .bos file into one row per element: EntityIndex, LocalId, GlobalId, Name, "
         + "Category, CategoryType, Type, ClassName, Level, Elevation, Room, Document, Workset, Group. "
-        + "The grouping workhorse: feed it to table.aggregate, bim.discipline, or bim.classifyRooms.");
+        + "The grouping workhorse: feed it to table.aggregate, bim.discipline, or bim.classifyRooms.",
+        Schemas:
+        [
+            KindSchemas.Static("table",
+                ColumnKinds.EntityIndex.NotNull(), ColumnKinds.LocalId.NotNull(), ColumnKinds.GlobalId, ColumnKinds.Name,
+                ColumnKinds.Category.NotNull(), ColumnKinds.CategoryType, ColumnKinds.Type, ColumnKinds.ClassName,
+                ColumnKinds.Level, ColumnKinds.Elevation, ColumnKinds.Room, ColumnKinds.Document,
+                ColumnKinds.Workset, ColumnKinds.Group),
+        ]);
 
     public IReadOnlyList<FlowValue> Eval(IEvalContext context, IReadOnlyList<FlowValue> inputs, ParamValues parameters)
     {
@@ -32,7 +40,7 @@ public sealed class BimElementsNode : IFlowNode
         b.AddColumn(Cells(e => e.Name), BimColumns.Name, typeof(string));
         b.AddColumn(Cells(e => e.Category), BimColumns.Category, typeof(string));
         b.AddColumn(Cells(e => e.CategoryType), BimColumns.CategoryType, typeof(string));
-        b.AddColumn(Cells(e => e.TypeName is { Length: > 0 } t ? t : null), BimColumns.Type, typeof(string));
+        b.AddColumn(Cells(e => e.TypeName), BimColumns.Type, typeof(string));
         b.AddColumn(Cells(e => e.ClassName), BimColumns.ClassName, typeof(string));
         b.AddColumn(Cells(e => e.LevelName), BimColumns.Level, typeof(string));
         b.AddColumn(Cells(e => (object?)e.ElevationOrNull()), BimColumns.Elevation, typeof(double));
@@ -44,7 +52,5 @@ public sealed class BimElementsNode : IFlowNode
     }
 
     private static object? Workset(EntityModel e)
-        => e.ParameterValues.ContainsKey(CommonRevitParameters.ElementWorksetId)
-            ? (long)e.GetParameterAsInt(CommonRevitParameters.ElementWorksetId)
-            : null;
+        => (long?)e.WorksetId;
 }

@@ -17,14 +17,20 @@ public sealed class BimNavGraphNode : IFlowNode
         Outputs: [new PortSpec("table", PortType.Table)],
         Params:
         [
-            new ParamSpec("path", ParamKind.FilePath),
-            new ParamSpec("doorCategories", ParamKind.Text, "Doors"),
+            new ParamSpec("path", ParamKind.FilePath, Bindable: PortType.Text, Suggest: SuggestSource.FilesWith(".bos")),
+            new ParamSpec("doorCategories", ParamKind.Text, "Doors", List: true),
         ],
         "Loads a .bos file into one row per door in the given categories: Door (entity index), "
         + "DoorName, Level, FromRoom, ToRoom — the rooms from the door's from/to-room parameters, "
         + "labelled 'Name Number' (so two Corridors on different floors stay distinct), with "
         + "Outside standing in for a missing side. The rows are the undirected edges of the room "
-        + "navigation graph; feed them to bim.hops for reachability.");
+        + "navigation graph; feed them to bim.hops for reachability.",
+        Schemas:
+        [
+            KindSchemas.Static("table",
+                ColumnKinds.Door.NotNull(), ColumnKinds.DoorName, ColumnKinds.Level,
+                ColumnKinds.FromRoom.NotNull(), ColumnKinds.ToRoom.NotNull()),
+        ]);
 
     public IReadOnlyList<FlowValue> Eval(IEvalContext context, IReadOnlyList<FlowValue> inputs, ParamValues parameters)
     {
@@ -50,9 +56,13 @@ public sealed class BimNavGraphNode : IFlowNode
     private static string SideLabel(EntityModel door, string roomParameter)
         => door.GetParameterAsEntity(roomParameter) is { } room ? RoomLabel(room) : BimColumns.Outside;
 
-    /// <summary>"Name Number" when the room has a number, else just Name.</summary>
+    /// <summary>"Name Number" when the room has a number, else just Name; a room without a
+    /// name is "[entity index]", so it stays its own vertex.</summary>
     private static string RoomLabel(EntityModel room)
-        => room.GetParameterAsString(CommonRevitParameters.RoomNumber) is { Length: > 0 } number
-            ? $"{room.Name} {number}"
-            : room.Name;
+    {
+        var name = room.Name ?? $"[{(int)room.Index}]";
+        return room.GetParameterAsString(CommonRevitParameters.RoomNumber) is { Length: > 0 } number
+            ? $"{name} {number}"
+            : name;
+    }
 }

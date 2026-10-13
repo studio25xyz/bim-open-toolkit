@@ -15,8 +15,8 @@ export function upgradeDuckDbGraph(document) {
         graph.values[source] = { path: values.path };
         sources.set(values.path, source);
       }
-      if (!graph.structure.edges.some(edge => edge.to === node.id + '.source'))
-        graph.structure.edges.push({ from: source + '.source', to: node.id + '.source' });
+      if (!graph.structure.edges.some(edge => edge.to === node.id + '.path'))
+        graph.structure.edges.push({ from: source + '.source', to: node.id + '.path' });
       delete values.path;
     }
     if (node.kind === 'table.sort' && values.by && !values.A && !values.B && !values.C) {
@@ -31,5 +31,18 @@ export function upgradeDuckDbGraph(document) {
       }
     }
   }
+  return graph;
+}
+
+/** A copy of the graph with the placeholder replaced by target (forward slashes) in every
+ * parameter value and every graph input default, as the host's SampleSeeding.RewritePaths does. */
+export function rewritePlaceholder(document, placeholder, target) {
+  const graph = structuredClone(document);
+  const path = target.replaceAll('\\', '/');
+  for (const values of Object.values(graph.values ?? {}))
+    for (const [name, value] of Object.entries(values))
+      if (typeof value === 'string') values[name] = value.replaceAll(placeholder, path);
+  for (const input of graph.structure?.inputs ?? [])
+    if (typeof input.default === 'string') input.default = input.default.replaceAll(placeholder, path);
   return graph;
 }

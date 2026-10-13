@@ -7,6 +7,7 @@ enriched IFC is made here, by a Run of `samples/nrc-analyses/nrc-enrich-run`,
 and the paper repository copies it back. The files live here so the toolkit's
 own tests are self-contained and so a host started with `samples/nrc` as a
 model root exposes the source name `nrc`.
+The Duplex files are buildingSMART International's, CC BY 4.0; `NOTICE.md` in this folder carries the attribution.
 
 | File | Rows | What it holds |
 |---|---|---|
@@ -20,6 +21,12 @@ model root exposes the source name `nrc`.
 | `nrc-run.csv` | 12 | run-level facts written once: run id, scenario, grid emission factor, and the provenance fields |
 
 Every value is synthetic; NRC has supplied no model or dataset.
+
+`ids/` holds the two IDS files the checking graphs read (see `ids/README.md`).
+`ids/nrc-analytics.ids` is generated from `nrc-metrics.csv` by `node scripts/nrc-ids.mjs`,
+so the property sets and names it requires are the ones the enrichment writes; rerun it after
+editing the dictionary, or `--check` to see whether the file is current. `dc-w1.ids` is
+written by hand.
 
 `.gitattributes` marks `samples/nrc/*.ifc` as binary so line endings are never converted.
 `.gitignore` excludes `*.ifc` repository-wide and re-includes `samples/nrc/*.ifc`,

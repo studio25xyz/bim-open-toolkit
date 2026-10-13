@@ -1,0 +1,67 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "about": { "x": 40, "y": 40, "w": 560, "h": 230 },
+    "database": { "x": 40, "y": 679 },
+    "elements": { "x": 385, "y": 643, "w": 310 },
+    "sequence": { "x": 784, "y": 643 },
+    "weekly": { "x": 1148, "y": 667 },
+    "joined": { "x": 1497, "y": 479 },
+    "zeroWeeks": { "x": 1846, "y": 479 },
+    "planned": { "x": 2195, "y": 479 },
+    "actual": { "x": 2544, "y": 479 },
+    "zeroActual": { "x": 2893, "y": 479 },
+    "synthetic": { "x": 3242, "y": 479 },
+    "answer": { "x": 3591, "y": 648, "w": 310 },
+    "spine": { "x": 1143, "y": 315 },
+    "curve": { "x": 3591, "y": 310, "w": 310 }
+  },
+  "structure": {
+    "edges": [
+      { "from": "elements.table", "to": "sequence.table" },
+      { "from": "sequence.elements", "to": "weekly.table" },
+      { "from": "spine.table", "to": "joined.a" },
+      { "from": "weekly.table", "to": "joined.b" },
+      { "from": "joined.table", "to": "zeroWeeks.table" },
+      { "from": "zeroWeeks.table", "to": "planned.table" },
+      { "from": "planned.table", "to": "actual.table" },
+      { "from": "actual.table", "to": "zeroActual.table" },
+      { "from": "zeroActual.table", "to": "synthetic.table" },
+      { "from": "synthetic.table", "to": "curve.table" },
+      { "from": "synthetic.table", "to": "answer.table" },
+      { "from": "database.source", "to": "elements.path" }
+    ],
+    "nodes": [
+      { "id": "about", "kind": "view.note", "version": 1 },
+      { "id": "database", "kind": "duck.source", "version": 1 },
+      { "id": "elements", "kind": "duck.query", "version": 1 },
+      { "id": "sequence", "kind": "bim.buildSequence", "version": 1 },
+      { "id": "weekly", "kind": "table.aggregate", "version": 1 },
+      { "id": "spine", "kind": "table.range", "version": 1 },
+      { "id": "joined", "kind": "table.join", "version": 1 },
+      { "id": "zeroWeeks", "kind": "table.derive", "version": 1 },
+      { "id": "planned", "kind": "table.window", "version": 1 },
+      { "id": "actual", "kind": "table.window", "version": 1 },
+      { "id": "zeroActual", "kind": "table.derive", "version": 1 },
+      { "id": "synthetic", "kind": "table.derive", "version": 1 },
+      { "id": "curve", "kind": "chart.line", "version": 1 },
+      { "id": "answer", "kind": "view.table", "version": 1 }
+    ]
+  },
+  "values": {
+    "about": { "text": "Project manager: how many elements should be installed by each week, and how far behind is the site? BOTH SERIES ARE SYNTHETIC. Planned is the cumulative count of elements whose bim.buildSequence task has finished by the end of each week (10-day tasks from 2027-01-04, storeys bottom-up, trades overlapping by one floor); Actual is the same curve held three weeks late (table.window lag 3), a made-up slip, not site data. On the S-curve, the vertical gap between the lines at a week is the shortfall in elements, and the horizontal gap at a height is the delay in weeks; week 0 is the start. Storeys come from StoreyOfElement in the DuckDB export, because bim.elements has no Level for an IFC-derived model." },
+    "elements": { "sql": "SELECT e.StepId, e.GlobalId, e.Name, e.Category, s.StoreyName AS Level, CAST(p.Value AS DOUBLE) AS Elevation FROM (SELECT EntityIndex, arg_min(StoreyIndex, Depth) AS StoreyIndex, arg_min(StoreyName, Depth) AS StoreyName FROM StoreyOfElement GROUP BY EntityIndex) s JOIN EntityText e USING (EntityIndex) LEFT JOIN ParameterText p ON p.EntityIndex = s.StoreyIndex AND p.Name = 'Ifc:Elevation' ORDER BY e.StepId" },
+    "sequence": { "levelColumn": "Level", "elevationColumn": "Elevation", "column": "Category", "start": "2027-01-04", "daysPerTask": "10", "trades": "Structure,Envelope,MEP,Finishes" },
+    "weekly": { "groupBy": "FinishWeek", "aggregates": "count(Task) as Installed" },
+    "spine": { "name": "Week", "start": "0", "stop": "11", "step": "1" },
+    "joined": { "aKey": "Week", "bKey": "FinishWeek", "mode": "left" },
+    "zeroWeeks": { "name": "Finished", "expr": "coalesce(Installed, 0)" },
+    "planned": { "function": "cumSum", "column": "Finished", "orderBy": "Week", "name": "Planned" },
+    "actual": { "function": "lag", "column": "Planned", "orderBy": "Week", "offset": "3", "name": "LaggedPlanned" },
+    "zeroActual": { "name": "Actual", "expr": "coalesce(LaggedPlanned, 0)" },
+    "synthetic": { "name": "Synthetic", "expr": "true" },
+    "curve": { "xColumn": "Week", "yColumns": "Planned,Actual", "title": "Elements installed by week (synthetic)" },
+    "database": { "path": "{SAMPLES}/duplex-enriched.duckdb" },
+    "answer": { "title": "Synthetic progress by week (elements)", "columns": "Week,Finished,Planned,Actual,Synthetic" }
+  }
+}

@@ -129,7 +129,7 @@ add-in under `plugins/` and the BOS Browser under bim-open-data's `apps/`.
 **IFC workflows** are handled by four projects that stay deliberately separate:
 
 - `Ara3D.IfcTypes` / `Ara3D.IfcLoader` — parsing and the entity/relation model (backed by web-ifc).
-- `Ara3D.Ifc.Mesher` — tessellation, the only place the native geometry dependency lives.
+- `Ara3D.Ifc.Mesher` — tessellation from the STEP geometry definitions, in C# with no native code; the web-ifc dependency is `Ara3D.IfcLoader`'s.
 - `Ara3D.Ifc.Editing` — **byte-exact** property-set editing: `IfcSourceFile` and
   `IfcEntitySpan` locate entities by byte range, `IfcPropertySetBuilder` composes new
   psets, `IfcDiff` and `IfcPatcher` splice them in. Everything you did not edit comes out
@@ -210,6 +210,13 @@ are bim-open-notebook's (`deps/bim-open-notebook`).
   the rest.
 - **`deps/bim-open-viewer/`** — the standalone 3D viewer workspace of seventeen packages, described in
   [OVERVIEW.md](OVERVIEW.md#the-3d-viewer).
+- **`deps/bim-open-plot/`** — the figure layer to come, [bim-open-plot](https://github.com/ara3d/bim-open-plot):
+  charts, drawings, and composed figures from result tables. On 2026-10-13 it holds the
+  brand, a component brief (`deps/bim-open-plot/PROJECT.md`), and a demo page, no library.
+  Its brief names bim-open-flow's `viz` package and the `chart.bar` and `chart.line` nodes
+  as what it replaces, so chart code still lives in bim-open-flow until it moves
+  (TKT-220 asks whether the `tables` profile keeps a 2D chart node; `panes/src/chartTheme.ts`
+  copies Plot's palette meanwhile, TKT-294).
 - **`Publishing` / `Reports` / `Dashboards` / `Evidence`** — turning a run into an
   artifact: self-contained HTML with inlined data, verdict tables, dashboards, and
   evidence packages whose manifest is canonical JSON with a SHA-256 per member file.

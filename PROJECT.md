@@ -1,6 +1,6 @@
 # BIM Open Toolkit: project brief
 
-Written 2026-09-26 from the repository's documents; rewritten 2026-10-04 after an alignment interview with the owner (the elicitation, three rounds of forced choices, and the diff are in `docs/plans/brief-alignment-2026-10-04.md`). It covers the family of repositories the toolkit composes: bim-open-schema, bim-open-data, bim-open-flow, bim-open-notebook, bim-open-viewer, and this one. A line ending `(unconfirmed)` rests on an inference; the owner confirms or corrects it and removes the marker.
+Written 2026-09-26 from the repository's documents; rewritten 2026-10-04 after an alignment interview with the owner (the elicitation, three rounds of forced choices, and the diff are in `docs/plans/brief-alignment-2026-10-04.md`). It covers the family of repositories the toolkit composes: bim-open-schema, bim-open-data, bim-open-flow, bim-open-notebook, bim-open-viewer, bim-open-plot (the figure layer: charts, drawings, and composed figures from result tables; brand, a component brief, and a demo page as of 2026-10-13, no library yet), and this one. A line ending `(unconfirmed)` rests on an inference; the owner confirms or corrects it and removes the marker.
 
 ## Purpose
 
@@ -27,7 +27,7 @@ Working with a building model today means a vendor's tool, its API, and a specia
 2. **Nothing writes until Run.** Evaluation for display, by a person or Claude, never touches a file; writers stay pending until an explicit Run: delegation is safe because exploring cannot do harm.
 3. **Honest absence.** A missing measure stays missing: no NULL turned into 0, no size read from a name, no identity merged on a matching position: a fabricated complete answer misleads every decision downstream.
 4. **Runs are the evidence.** A run pins the graph and every input by content hash and replays; a number Claude reports comes from a tool result, never from memory.
-5. **Tables are the currency.** Almost everything on a wire is a table; scalars are parameters on the node; a new need is a node or a parameter kind, never a wire type: one vocabulary serves ETL, SQL, 3D, charts, documents, and checks.
+5. **Tables are the currency.** Almost everything on a wire is a table; a resource (a database, a model) may also travel as a hashed, pinned handle; scalars are parameters on the node; a new need is a node, a parameter kind, or a resource, never a scalar wire type: one vocabulary serves ETL, SQL, 3D, charts, documents, and checks.
 6. **The catalog is the documentation; warn, never block.** Every node declares its ports, kinds, and purity, and the docs are generated from that; an unknown column or a bad query is a warning shown before any run: people wire graphs before the data exists, and agents ask instead of guessing.
 7. **The agent works in the open graph.** Claude knows which graph is open, what is selected, and the last result without being told an id, and its edits land selected and undoable.
 8. **It explains itself.** Every result names the graph that made it, every node shows its state and the upstream cause, every wire can be peeked at: the owner can say at a demo what each step did and what the output means.
@@ -39,7 +39,7 @@ Replaces: SQL typed into a DuckDB shell and spreadsheet checks over exports; scr
 
 ## Scope
 
-In: the schema and its reference implementation; the dataflow engine, host, MCP servers, editor, and panes; the notebook; the 3D viewer; the BIM node packs, studio, samples, and gates; scripts as node definitions; the public sample pages; the benchmark. Also kept and tested, no longer driving priorities: the rule check with its evidence package, and the NRC (National Research Council Canada) paper's reproduction and byte-exact IFC write-back. Windows for the full toolkit; the engine, schema, and web parts are portable.
+In: the schema and its reference implementation; the dataflow engine, host, MCP servers, editor, and panes; the notebook; the 3D viewer; the figure layer (charts, drawings, and composed figures, bim-open-plot); the BIM node packs, studio, samples, and gates; scripts as node definitions; the public sample pages; the benchmark. Also kept and tested, no longer driving priorities: the rule check with its evidence package, and the NRC (National Research Council Canada) paper's reproduction and byte-exact IFC write-back. Windows for the full toolkit; the engine, schema, and web parts are portable.
 Out: authoring or editing geometry; a live connection to any authoring tool (the Revit add-in exports and is not extended); a hosted multi-user service with accounts; a general scripting API outside node definitions; several models in one graph or one Run (TKT-21 may reopen this); clash detection beyond bounding-box candidates; node-graph instrument features no workflow needs; Gratify learning anything about BIM.
 
 ## Success

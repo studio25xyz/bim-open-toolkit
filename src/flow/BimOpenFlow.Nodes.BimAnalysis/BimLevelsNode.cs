@@ -13,10 +13,16 @@ public sealed class BimLevelsNode : IFlowNode
         Kind, 1, NodeCapability.Pure,
         Inputs: [],
         Outputs: [new PortSpec("table", PortType.Table)],
-        Params: [new ParamSpec("path", ParamKind.FilePath)],
+        Params: [new ParamSpec("path", ParamKind.FilePath, Bindable: PortType.Text, Suggest: SuggestSource.FilesWith(".bos"))],
         "Loads a .bos file into one row per level, ordered by elevation: EntityIndex, Name, "
         + "Elevation, ElementCount (elements whose Level parameter points here), RoomCount. "
-        + "Levels are the elements carrying a level-elevation parameter or categorized as Levels.");
+        + "Levels are the elements carrying a level-elevation parameter or categorized as Levels.",
+        Schemas:
+        [
+            KindSchemas.Static("table",
+                ColumnKinds.EntityIndex.NotNull(), ColumnKinds.Name, ColumnKinds.Elevation.NotNull(),
+                ColumnKinds.ElementCount.NotNull(), ColumnKinds.RoomCount.NotNull()),
+        ]);
 
     public IReadOnlyList<FlowValue> Eval(IEvalContext context, IReadOnlyList<FlowValue> inputs, ParamValues parameters)
     {
@@ -40,7 +46,7 @@ public sealed class BimLevelsNode : IFlowNode
         b.AddColumn(Cells(e => e.Name), BimColumns.Name, typeof(string));
         b.AddColumn(Cells(e => Elevation(e)), BimColumns.Elevation, typeof(double));
         b.AddColumn(Cells(e => CountOnLevel(e.Index, _ => true)), BimColumns.ElementCount, typeof(long));
-        b.AddColumn(Cells(e => CountOnLevel(e.Index, r => roomCategories.Contains(r.Category))),
+        b.AddColumn(Cells(e => CountOnLevel(e.Index, r => r.Category is { } c && roomCategories.Contains(c))),
             BimColumns.RoomCount, typeof(long));
         return [new TableValue(b.Build())];
     }

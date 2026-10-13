@@ -1,0 +1,52 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "about": { "x": 40, "y": 40, "w": 560, "h": 410 },
+    "database": { "x": 40, "y": 926 },
+    "model": { "x": 989, "y": 526 },
+    "elements": { "x": 385, "y": 890 },
+    "sequence": { "x": 994, "y": 890 },
+    "taskTable": { "x": 1358, "y": 1525 },
+    "weeks": { "x": 1358, "y": 1095 },
+    "taskChart": { "x": 1967, "y": 1160 },
+    "inst": { "x": 1353, "y": 490 },
+    "colored": { "x": 1967, "y": 600 }
+  },
+  "structure": {
+    "edges": [
+      { "from": "elements.table", "to": "sequence.table" },
+      { "from": "sequence.elements", "to": "weeks.values" },
+      { "from": "sequence.tasks", "to": "taskTable.table" },
+      { "from": "sequence.tasks", "to": "taskChart.table" },
+      { "from": "weeks.legend", "to": "taskChart.scale" },
+      { "from": "inst.instances", "to": "colored.instances" },
+      { "from": "sequence.elements", "to": "colored.values" },
+      { "from": "weeks.legend", "to": "colored.scale" },
+      { "from": "database.source", "to": "elements.path" },
+      { "from": "model.path", "to": "inst.path" }
+    ],
+    "nodes": [
+      { "id": "about", "kind": "view.note", "version": 1 },
+      { "id": "model", "kind": "value.path", "version": 1 },
+      { "id": "database", "kind": "duck.source", "version": 1 },
+      { "id": "elements", "kind": "duck.query", "version": 1 },
+      { "id": "sequence", "kind": "bim.buildSequence", "version": 1 },
+      { "id": "weeks", "kind": "view.colormap", "version": 1 },
+      { "id": "taskTable", "kind": "view.table", "version": 1 },
+      { "id": "taskChart", "kind": "chart.bar", "version": 1 },
+      { "id": "inst", "kind": "view3d.instances", "version": 1 },
+      { "id": "colored", "kind": "view3d.color", "version": 1 }
+    ]
+  },
+  "values": {
+    "about": { "text": "Role: a site superintendent. Question: in what order do the Duplex's floors and trades get built, and which parts are finished by which week? The dates are synthetic: bim.buildSequence invents a floor-by-floor cycle from the model and reads no real programme.\nHow it schedules: storeys run bottom-up; trades run Structure, Envelope, MEP, Finishes, each task 10 calendar days from Monday 2027-01-04. A trade starts a storey once the trade before it has left that storey and its own crew has left the storey below, so trades overlap by one floor. A trade with no elements in the model (the Duplex has no MEP) takes no time; IfcSpace rows belong to no trade and stay unscheduled (one warning on 'sequence'). Storeys come from StoreyOfElement in the DuckDB export ('elements'), because bim.elements has no Level for an IFC-derived model.\nHow to read it: 'taskChart' has one bar of elements per task, coloured by finish week; 'taskTable' lists each task's dates; the Gantt in specs/viz-construction-sequence.vl.json draws a bar from Start to End per task, coloured by trade. The 3D view ('colored') colours each element by the week its task finishes on the same viridis scale ('weeks'): dark is early, yellow late; grey parts have no storey or no trade.\nThe schedule for the Duplex is in samples/viz-analyses/README.md." },
+    "elements": { "sql": "SELECT e.StepId, e.GlobalId, e.Name, e.Category, s.StoreyName AS Level, CAST(p.Value AS DOUBLE) AS Elevation FROM (SELECT EntityIndex, arg_min(StoreyIndex, Depth) AS StoreyIndex, arg_min(StoreyName, Depth) AS StoreyName FROM StoreyOfElement GROUP BY EntityIndex) s JOIN EntityText e USING (EntityIndex) LEFT JOIN ParameterText p ON p.EntityIndex = s.StoreyIndex AND p.Name = 'Ifc:Elevation' ORDER BY e.StepId" },
+    "sequence": { "levelColumn": "Level", "elevationColumn": "Elevation", "column": "Category", "start": "2027-01-04", "daysPerTask": "10", "trades": "Structure,Envelope,MEP,Finishes" },
+    "weeks": { "valueColumn": "FinishWeek", "colorMap": "viridis" },
+    "taskTable": { "title": "Synthetic construction sequence", "columns": "Task,Storey,Trade,Start,End,DurationDays,FinishWeek,ElementCount,Synthetic" },
+    "taskChart": { "labelColumn": "Task", "valueColumns": "ElementCount", "title": "Elements per task" },
+    "colored": { "joinColumn": "GlobalId", "valueColumn": "FinishWeek" },
+    "database": { "path": "{SAMPLES}/duplex-enriched.duckdb" },
+    "model": { "path": "{SAMPLES}/duplex-base.ifc" }
+  }
+}

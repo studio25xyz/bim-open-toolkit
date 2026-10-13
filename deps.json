@@ -5,30 +5,34 @@
   },
   "bim-open-viewer": {
     "url": "https://github.com/ara3d/bim-open-viewer",
-    "commit": "915404deb49dd3f7ee90b0a8c6466edb2e2be4f5"
+    "commit": "bf02fa5851824f0e88b62be65e53e82cb00f843f"
   },
   "bim-open-schema": {
     "url": "https://github.com/ara3d/bim-open-schema",
-    "commit": "d12e63585b082e0191c956005abe9b6cb0d53212"
+    "commit": "c369c32021c0930b54cb338253d82fce933846b2"
   },
   "ara3d-sdk": {
     "url": "https://github.com/ara3d/ara3d-sdk",
-    "commit": "d41dfa7404ae363a9b825677b432738f77554479"
+    "commit": "24939c159267a4d142564f566db5c01aa0606ef5"
   },
   "bim-open-data": {
     "url": "https://github.com/ara3d/bim-open-data",
-    "commit": "0186610c62877ace2071f180c0a9372d05d6846e"
+    "commit": "fa4b801f0f8f6a19c930a13575310054ef035122"
   },
   "ara3d-dataflow": {
     "url": "https://github.com/ara3d/ara3d-dataflow",
-    "commit": "54479a9c2ffb8fe0249c837739f09d10e9e2aa0b"
+    "commit": "386e791b8db417232afb34540faa64229538cdeb"
   },
   "bim-open-flow": {
     "url": "https://github.com/ara3d/bim-open-flow",
-    "commit": "85cd9ab9098562525717c39192026167ea8d04c9"
+    "commit": "a1aa7ac2688a587e2d36b2ce65801944c941fab3"
   },
   "bim-open-notebook": {
     "url": "https://github.com/ara3d/bim-open-notebook",
-    "commit": "013867552ccd193ca370a18f259bedd7b2d07b13"
+    "commit": "4c809481f2ddfe6f4a995d0e5165624131afb876"
+  },
+  "bim-open-plot": {
+    "url": "https://github.com/ara3d/bim-open-plot",
+    "commit": "8fd8435cab939a2989975e7fffa8ad5946bf4250"
   }
 }

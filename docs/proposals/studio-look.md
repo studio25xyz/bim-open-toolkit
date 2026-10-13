@@ -2,7 +2,7 @@
 
 > Written 2026-09-29 by Claude Fable 5.1 with Christopher Diggins, from a
 > review of a screenshot of the editor at `/?analysis=clash-candidates` and
-> a prototype built the same day. Status: prototype at `/studio.html`, kept
+> a prototype built the same day. Status: the default look at `/` since 2026-10-12 (the classic look moved to `/classic.html`); before that a prototype at `/studio.html`, kept
 > beside the classic look at `/`; which one to continue, or whether to start
 > a third, is an open decision.
 
@@ -65,3 +65,12 @@ Because the controller is shared, the choice costs nothing in logic: keep
 one chrome factory and delete the other, or write a third against
 `chrome.ts`. A third look should start from `studioChrome.ts` (about 250
 lines) rather than from `app.ts`.
+
+## Canvas marks: the owner's rulings of 2026-10-12
+
+Made while looking at `bim-nearest-door` and `bos-to-relations` in the browser; the test of any mark is whether it explains itself on a sample flow.
+
+- A connection is a wire. Chips (a pill naming the source on the parameter it fed, TKT-138) read as "unconnected" and were removed; a wire into a parameter socket is drawn thinner and fainter than a table wire, and a Relation wire is drawn hollow.
+- Category colour sits on the card border and sockets, by pack role (six hues, `canvasTheme.ts`), not on a stripe; a small adornment that buys nothing is cut.
+- A card whose kind writes on Run carries the writer glyph; the key under the canvas "?" button names every mark that is not a wire (`packKey.ts`).
+- The studio look is the root page; the classic look is `/classic.html`.

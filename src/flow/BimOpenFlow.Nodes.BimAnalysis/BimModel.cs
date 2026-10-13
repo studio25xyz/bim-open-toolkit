@@ -28,8 +28,10 @@ public sealed class BimModel
         foreach (var p in data.Parameters)
         {
             var d = data.Get(p.Descriptor);
-            if (d is { Type: ParameterType.Point } desc && p.Value >= 0)
-                _points[(p.Entity, data.Get(desc.Name))] = data.Get((PointIndex)p.Value);
+            if (d is { Type: ParameterType.Point } desc
+                && data.Get(desc.Name) is { } name
+                && data.Get((PointIndex)p.Value) is { } point)
+                _points[(p.Entity, name)] = point;
         }
     }
 
@@ -66,6 +68,6 @@ public sealed class BimModel
     public IEnumerable<EntityModel> ElementsInCategories(string categories)
     {
         var set = new HashSet<string>(categories.SplitNames(), StringComparer.OrdinalIgnoreCase);
-        return InstanceElements().Where(e => set.Contains(e.Category));
+        return InstanceElements().Where(e => e.Category is { } c && set.Contains(c));
     }
 }

@@ -1,0 +1,135 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "about": {
+      "x": 40,
+      "y": 40,
+      "w": 560,
+      "h": 140
+    },
+    "modelPath": {
+      "x": 40,
+      "y": 438
+    },
+    "model": {
+      "x": 385,
+      "y": 354
+    },
+    "verdicts": {
+      "x": 734,
+      "y": 354
+    },
+    "failures": {
+      "x": 1083,
+      "y": 220
+    },
+    "answer": {
+      "x": 1594,
+      "y": 220
+    },
+    "chart": {
+      "x": 1083,
+      "y": 512
+    }
+  },
+  "structure": {
+    "inputs": [
+      {
+        "name": "model",
+        "kind": "FilePath",
+        "default": "{SAMPLES}/duplex-enriched.bos",
+        "description": "The building's BIM Open Schema (.bos) file; the NRC Duplex by default, any .bos file works here."
+      }
+    ],
+    "edges": [
+      {
+        "from": "modelPath.path",
+        "to": "model.path"
+      },
+      {
+        "from": "model.entities",
+        "to": "verdicts.entities"
+      },
+      {
+        "from": "model.parameters",
+        "to": "verdicts.parameters"
+      },
+      {
+        "from": "verdicts.verdicts",
+        "to": "failures.table"
+      },
+      {
+        "from": "failures.table",
+        "to": "answer.table"
+      },
+      {
+        "from": "verdicts.summary",
+        "to": "chart.table"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "about",
+        "kind": "view.note",
+        "version": 1
+      },
+      {
+        "id": "modelPath",
+        "kind": "value.path",
+        "version": 1
+      },
+      {
+        "id": "model",
+        "kind": "bos.load",
+        "version": 1
+      },
+      {
+        "id": "verdicts",
+        "kind": "ids.check",
+        "version": 1
+      },
+      {
+        "id": "failures",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "answer",
+        "kind": "view.table",
+        "version": 1
+      },
+      {
+        "id": "chart",
+        "kind": "chart.bar",
+        "version": 1
+      }
+    ]
+  },
+  "values": {
+    "about": {
+      "text": "The NRC carbon property sets as an IDS (nrc-analytics.ids) over the enriched Duplex: each of the two specifications applies to the 218 analysed elements. Every one has its operational carbon; one, the roof, has no embodied-carbon row and fails IDS-EC (honest absence, the same answer as nrc-q7-absence). chart counts verdicts per specification; answer lists the failing elements."
+    },
+    "modelPath": {
+      "path": "$model"
+    },
+    "model": {
+      "harmonize": "false"
+    },
+    "verdicts": {
+      "ids": "{SAMPLES}/ids/nrc-analytics.ids"
+    },
+    "failures": {
+      "expr": "[Verdict] != 'Pass'"
+    },
+    "answer": {
+      "title": "Failing elements",
+      "columns": "GlobalId, CheckId, Reason"
+    },
+    "chart": {
+      "labelColumn": "CheckTitle",
+      "valueColumns": "Pass, Fail, InfoNotAvailable",
+      "title": "NRC carbon property sets: elements per IDS verdict",
+      "sort": "none"
+    }
+  }
+}

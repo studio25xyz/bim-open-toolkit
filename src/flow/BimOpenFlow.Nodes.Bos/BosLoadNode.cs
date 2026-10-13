@@ -19,6 +19,11 @@ public sealed class BosLoadNode : IFlowNode
 {
     public const string Kind = "bos.load";
 
+    /// <summary>The tables the three text views and the harmonizer use: entities, parameters, and relations
+    /// (a read adds the descriptors, strings, numbers, and points those index). Geometry, documents, and
+    /// diagnostics are never read; harmonizing adds its own diagnostics, which no output shows.</summary>
+    private const BosTables TablesRead = BosTables.Entities | BosTables.Parameters | BosTables.Relations;
+
     private sealed record LoadedTables(IDataTable Entities, IDataTable Parameters, IDataTable Relations);
 
     // TODO: unbounded cache; add eviction (or move memoization fully into the engine)
@@ -39,10 +44,22 @@ public sealed class BosLoadNode : IFlowNode
         ],
         Params:
         [
-            new ParamSpec("path", ParamKind.FilePath),
+            new ParamSpec("path", ParamKind.FilePath, Bindable: PortType.Text, Suggest: SuggestSource.FilesWith(".bos")),
             new ParamSpec("harmonize", ParamKind.Boolean, "false"),
         ],
-        "Loads a BIM Open Schema (.bos) file and outputs its entity, parameter, and relation text tables.");
+        "Loads a BIM Open Schema (.bos) file and outputs its entity, parameter, and relation text tables.",
+        Schemas:
+        [
+            KindSchemas.Static("entities",
+                ColumnKinds.EntityIndex.NotNull(), ColumnKinds.StepId, ColumnKinds.GlobalId, ColumnKinds.Name,
+                ColumnKinds.Category, ColumnKinds.Type),
+            KindSchemas.Static("parameters",
+                ColumnKinds.EntityIndex.NotNull(), ColumnKinds.Name, ColumnKinds.ParameterGroup, ColumnKinds.Units,
+                ColumnKinds.ValueType, ColumnKinds.Value),
+            KindSchemas.Static("relations",
+                ColumnKinds.EntityIndexA.NotNull(), ColumnKinds.NameA, ColumnKinds.EntityIndexB.NotNull(),
+                ColumnKinds.NameB, ColumnKinds.RelationType),
+        ]);
 
     public IReadOnlyList<FlowValue> Eval(IEvalContext context, IReadOnlyList<FlowValue> inputs, ParamValues parameters)
     {
@@ -61,15 +78,22 @@ public sealed class BosLoadNode : IFlowNode
 
     private static LoadedTables Load(string path, bool harmonize)
     {
-        IBimData data = new FilePath(path).ReadBimDataFromParquetZip();
+        IBimData data = new FilePath(path).ReadBimDataFromParquetZip(TablesRead);
         if (harmonize)
             data = BosHarmonizer.Harmonize(data);
         using var conn = data.ToDuckDb();
         return new(
-            conn.Query("SELECT * FROM EntityText ORDER BY EntityIndex", "entities"),
-            conn.Query("SELECT * FROM ParameterText ORDER BY EntityIndex, Name", "parameters"),
-            conn.Query("SELECT * FROM RelationText ORDER BY EntityIndexA, EntityIndexB, RelationType", "relations"));
+            conn.Query(EntitiesQuery, "entities"),
+            conn.Query(ParametersQuery, "parameters"),
+            conn.Query(RelationsQuery, "relations"));
     }
+
+    /// <summary>The queries behind the three outputs. Each order is total, so two parameters
+    /// that share an entity and a name (in different groups) always come out in the same order.</summary>
+    public const string EntitiesQuery = "SELECT * FROM EntityText ORDER BY EntityIndex";
+    public const string ParametersQuery =
+        "SELECT * FROM ParameterText ORDER BY EntityIndex, Name, ParameterGroup NULLS FIRST, ValueType, Value NULLS FIRST";
+    public const string RelationsQuery = "SELECT * FROM RelationText ORDER BY EntityIndexA, EntityIndexB, RelationType";
 
     private static string ContentHash(string path)
     {

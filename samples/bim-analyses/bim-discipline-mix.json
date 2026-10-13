@@ -1,27 +1,44 @@
 {
   "formatVersion": "0.1.0",
   "layout": {
-    "byDiscipline": { "x": 700, "y": 40 },
-    "disciplines": { "x": 370, "y": 40 },
-    "elements": { "x": 40, "y": 40 },
-    "ranked": { "x": 1030, "y": 40 }
+    "about": { "x": 40, "y": 40, "w": 560, "h": 104 },
+    "model": { "x": 40, "y": 369 },
+    "elements": { "x": 385, "y": 333 },
+    "disciplines": { "x": 734, "y": 333 },
+    "byDiscipline": { "x": 1083, "y": 333 },
+    "ranked": { "x": 1432, "y": 333 },
+    "answer": { "x": 1781, "y": 184 },
+    "chart": { "x": 1781, "y": 482 }
   },
   "structure": {
+    "inputs": [
+      { "default": "{SAMPLES}/sample.bos", "description": "The building's BIM Open Schema (.bos) file; any public sample building works here.", "kind": "FilePath", "name": "model" }
+    ],
     "edges": [
+      { "from": "model.path", "to": "elements.path" },
       { "from": "elements.table", "to": "disciplines.table" },
       { "from": "disciplines.table", "to": "byDiscipline.table" },
-      { "from": "byDiscipline.table", "to": "ranked.table" }
+      { "from": "byDiscipline.table", "to": "ranked.table" },
+      { "from": "ranked.table", "to": "answer.table" },
+      { "from": "ranked.table", "to": "chart.table" }
     ],
     "nodes": [
-      { "id": "byDiscipline", "kind": "table.aggregate", "version": 1 },
-      { "id": "disciplines", "kind": "bim.discipline", "version": 1 },
+      { "id": "about", "kind": "view.note", "version": 1 },
+      { "id": "model", "kind": "value.path", "version": 1 },
       { "id": "elements", "kind": "bim.elements", "version": 1 },
-      { "id": "ranked", "kind": "table.sort", "version": 1 }
+      { "id": "disciplines", "kind": "bim.discipline", "version": 1 },
+      { "id": "byDiscipline", "kind": "table.aggregate", "version": 1 },
+      { "id": "ranked", "kind": "table.sort", "version": 1 },
+      { "id": "answer", "kind": "view.table", "version": 1 },
+      { "id": "chart", "kind": "chart.bar", "version": 1 }
     ]
   },
   "values": {
+    "about": { "text": "Every element from bim.elements, put in a discipline by its category (bim.discipline), counted and ranked. Levels count too and land in General. Set the model input to another .bos file to run the same graph on that building." },
+    "model": { "path": "$model" },
     "byDiscipline": { "aggregates": "count(*) as Elements", "groupBy": "Discipline" },
-    "elements": { "path": "{SAMPLES}/sample.bos" },
-    "ranked": { "by": "Elements desc" }
+    "ranked": { "A": "Elements", "descendingA": "true" },
+    "answer": { "title": "Elements per discipline" },
+    "chart": { "labelColumn": "Discipline", "title": "Elements per discipline", "valueColumns": "Elements" }
   }
 }

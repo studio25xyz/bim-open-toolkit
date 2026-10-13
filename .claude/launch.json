@@ -402,6 +402,42 @@
         "pages:preview"
       ],
       "port": 5191
+    },
+    {
+      "name": "flow-host",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "host",
+        "--prefix",
+        "deps/bim-open-flow/bimopenflow/web"
+      ],
+      "port": 5214
+    },
+    {
+      "name": "flow-pages",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5320",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "deps/bim-open-flow/site"
+      ],
+      "port": 5320
+    },
+    {
+      "name": "flow-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "web",
+        "--prefix",
+        "deps/bim-open-flow/bimopenflow/web"
+      ],
+      "port": 5304
     }
   ]
 }

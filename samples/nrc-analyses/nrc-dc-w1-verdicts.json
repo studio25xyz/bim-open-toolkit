@@ -1,69 +1,71 @@
 {
   "formatVersion": "0.1.0",
   "layout": {
+    "about": {
+      "x": 40,
+      "y": 40,
+      "w": 560,
+      "h": 180
+    },
     "entities": {
       "x": 40,
-      "y": 40
+      "y": 352
+    },
+    "doors": {
+      "x": 389,
+      "y": 352
+    },
+    "doorWidths": {
+      "x": 738,
+      "y": 486
+    },
+    "widthMm": {
+      "x": 1087,
+      "y": 486
+    },
+    "columns": {
+      "x": 1436,
+      "y": 486
+    },
+    "byDoor": {
+      "x": 1785,
+      "y": 486
+    },
+    "rows": {
+      "x": 2134,
+      "y": 486
+    },
+    "answer": {
+      "x": 2483,
+      "y": 403
+    },
+    "coloured": {
+      "x": 2978,
+      "y": 842
+    },
+    "perVerdict": {
+      "x": 2978,
+      "y": 260
+    },
+    "chart": {
+      "x": 3327,
+      "y": 260
     },
     "parameters": {
       "x": 40,
-      "y": 280
-    },
-    "doors": {
-      "x": 370,
-      "y": 40
+      "y": 644
     },
     "overallWidth": {
-      "x": 370,
-      "y": 300
-    },
-    "doorWidths": {
-      "x": 700,
-      "y": 40
-    },
-    "metres": {
-      "x": 1030,
-      "y": 40
-    },
-    "millimetres": {
-      "x": 1360,
-      "y": 40
-    },
-    "columns": {
-      "x": 1690,
-      "y": 40
-    },
-    "byDoor": {
-      "x": 2030,
-      "y": 40
-    },
-    "rows": {
-      "x": 2350,
-      "y": 40
-    },
-    "answer": {
-      "x": 2680,
-      "y": 40
+      "x": 389,
+      "y": 644
     },
     "model": {
-      "x": 2680,
-      "y": 600
-    },
-    "coloured": {
-      "x": 3140,
-      "y": 40
-    },
-    "perVerdict": {
-      "x": 3450,
-      "y": 40
-    },
-    "chart": {
-      "x": 3760,
-      "y": 40
+      "x": 2479,
+      "y": 1070
     },
     "report": {
-      "x": 3450,
-      "y": 440
+      "x": 2978,
+      "y": 558
     }
   },
   "structure": {
@@ -86,14 +88,10 @@
       },
       {
         "from": "doorWidths.relation",
-        "to": "metres.input"
+        "to": "widthMm.input"
       },
       {
-        "from": "metres.relation",
-        "to": "millimetres.input"
-      },
-      {
-        "from": "millimetres.relation",
+        "from": "widthMm.relation",
         "to": "columns.input"
       },
       {
@@ -131,6 +129,11 @@
     ],
     "nodes": [
       {
+        "id": "about",
+        "kind": "view.note",
+        "version": 1
+      },
+      {
         "id": "entities",
         "kind": "rel.table",
         "version": 1
@@ -156,12 +159,7 @@
         "version": 1
       },
       {
-        "id": "metres",
-        "kind": "rel.derive",
-        "version": 1
-      },
-      {
-        "id": "millimetres",
+        "id": "widthMm",
         "kind": "rel.derive",
         "version": 1
       },
@@ -213,6 +211,9 @@
     ]
   },
   "values": {
+    "about": {
+      "text": "Rule DC-W1 over the 14 doors of duplex-enriched: a door's Ifc:OverallWidth, in millimetres, must be at least 850 (NBC 2020 3.8.3.12, illustrative, not legal text); 8 pass and 6 fail. This is the check.rule twin of checking-analyses/check-ids-door-width, which states the same rule as an IDS file and gets the same verdicts. coloured paints the verdicts on the model, chart counts them, and report writes its HTML file only when you press Run."
+    },
     "entities": {
       "source": "duplex-enriched",
       "table": "EntityText"
@@ -232,16 +233,12 @@
       "rightKey": "EntityIndex",
       "kind": "inner"
     },
-    "metres": {
-      "name": "Width_m",
-      "expr": "toNumber([Value])"
-    },
-    "millimetres": {
+    "widthMm": {
       "name": "Width_mm",
-      "expr": "[Width_m] * 1000"
+      "expr": "toNumber([Value]) * 1000"
     },
     "columns": {
-      "columns": "GlobalId, Name, Width_m, Width_mm"
+      "columns": "Name, Width_mm, GlobalId"
     },
     "byDoor": {
       "by": "GlobalId"
@@ -260,22 +257,22 @@
       "path": "{SAMPLES}/duplex-enriched.ifc"
     },
     "coloured": {
-      "joinColumn": "globalId",
-      "valueColumn": "verdict",
+      "joinColumn": "GlobalId",
+      "valueColumn": "Verdict",
       "colorMap": "category10"
     },
     "perVerdict": {
-      "groupBy": "verdict",
+      "groupBy": "Verdict",
       "aggregates": "count(*) as Doors"
     },
     "chart": {
-      "labelColumn": "verdict",
+      "labelColumn": "Verdict",
       "valueColumns": "Doors",
       "title": "DC-W1 door width verdicts",
       "sort": "desc"
     },
     "report": {
-      "path": "{SAMPLES}/../../artifacts/nrc/dc-w1-verdicts.html",
+      "path": "{ARTIFACTS}/nrc/dc-w1-verdicts.html",
       "title": "DC-W1 door width verdicts"
     }
   }

@@ -27,7 +27,7 @@ Studio 2.5 takes its inspiration from [From Hierarchy to Intelligence](https://b
 > - **Origin.** This is the Studio 2.5 fork of [ara3d/bim-open-toolkit](https://github.com/ara3d/bim-open-toolkit). The toolkit was created by Christopher Diggins at Ara 3D, who holds the copyright, and is released under the MIT licence.
 > - **Pre-release.** This is version 0.1 software under active development. It is provided as is, without warranty of any kind, and is not presented as production ready. Interfaces, file formats, and documents may change.
 > - **Dependencies belong to Ara 3D.** The schema, data, flow, viewer, and notebook code, and three supporting libraries, live in eight separate `ara3d` repositories that `node deps.mjs` fetches at pinned commits. Studio 2.5 does not maintain those repositories.
-> - **One extra setup step for the full build (checked 2026-10-07).** The studio host, the web editor, and both MCP servers build as described below. `dotnet build BimOpenToolkit.sln`, and so the solution-wide test run, also needs the packages `Platonic.Core` and `Platonic.Analyzers` 0.1.0, which are not on nuget.org. Clone [cdiggins/Platonic.CSharp](https://github.com/cdiggins/Platonic.CSharp), run `dotnet pack src/Platonic.Core -c Release` and `dotnet pack src/Platonic.Analyzers -c Release` in it, and set the environment variable `PlatonicRoot` to that clone's full path before building. With that step the solution builds with no errors and the test run CI uses passes (1,533 passed, 8 skipped, 0 failed).
+> - **One extra setup step.** The .NET build needs the packages `Platonic.Core` and `Platonic.Analyzers` 0.1.0, which are not on nuget.org yet. [Platonic packages](#platonic-packages) below gives the three commands.
 > - **Sample models.** The MIT licence covers the code, not third-party building models. No model file, image, or sample notebook from Autodesk's Snowdon Towers sample is included in this fork; the demos that name it need your own copy, used under Autodesk's licence terms. Other sample models remain under their owners' terms.
 > - **Browser demos.** The `ara3d.github.io` links below open Ara 3D's published pages, not pages hosted by Studio 2.5.
 
@@ -53,6 +53,7 @@ which code still lives here.
 | <img src="docs/brand/mark.svg" width="22" height="22" alt=""> | [bim-open-flow](https://github.com/ara3d/bim-open-flow) | Graphs over tables: node packs, headless host, web editor, MCP server |
 | <img src="docs/brand/viewer-mark.svg" width="22" height="22" alt=""> | [bim-open-viewer](https://github.com/ara3d/bim-open-viewer) | WebGL viewer for building models, 17 npm packages |
 | <img src="docs/brand/notebook-mark.svg" width="22" height="22" alt=""> | [bim-open-notebook](https://github.com/ara3d/bim-open-notebook) | A session with an agent kept as a document of results that can be evaluated again |
+| <img src="docs/brand/plot-mark.svg" width="22" height="22" alt=""> | [bim-open-plot](https://github.com/ara3d/bim-open-plot) | Charts, drawings, and figures from result tables; brand and design research so far, no code yet |
 
 [![The family page: purpose, the two in-browser demos, and the repositories](docs/images/family-page.png)](https://ara3d.github.io/bim-open-toolkit/)
 
@@ -109,6 +110,18 @@ the design in detail. [docs/OVERVIEW.md](docs/OVERVIEW.md) is the one-page versi
 
 Run `node scripts/preflight.mjs` to check these, plus a .NET SDK and the private
 Snowdon model the 3D and DuckDB demos need, before following the steps below.
+
+### Platonic packages
+
+Every .NET project in `deps/bim-open-data` references `Platonic.Core` and `Platonic.Analyzers` 0.1.0. They are not on nuget.org yet (TKT-293 will publish them and make this step unnecessary), so a fresh clone fails restore with NU1101. Until then, clone [cdiggins/Platonic.CSharp](https://github.com/cdiggins/Platonic.CSharp) as a sibling of the toolkit's parent folder (`Platonic.props` looks three levels up from `deps/bim-open-data`; with the toolkit at `~/git/bim-open-toolkit`, that is `~/git/Platonic.CSharp`) and pack both projects into its `artifacts` folder:
+
+```bash
+git clone https://github.com/cdiggins/Platonic.CSharp ../Platonic.CSharp
+dotnet pack ../Platonic.CSharp/src/Platonic.Core -c Release -o ../Platonic.CSharp/artifacts
+dotnet pack ../Platonic.CSharp/src/Platonic.Analyzers -c Release -o ../Platonic.CSharp/artifacts
+```
+
+To keep the clone elsewhere, pass its path as `-p:PlatonicRoot=<clone>` to `dotnet build`.
 
 ## Start here
 
@@ -252,6 +265,7 @@ assessment from 2026-09-08.
 | `plugins/` | The Revit 2025 add-ins: BOS exporter, Bowerbird host, samples, and `Ara3D.Revit.Utils` |
 | `bimopenflow/web/` | The toolkit's web workspace: the studio's pages (`studio-web`) and the NRC pages (`nrc-web`: `nrc.html` and the sample-notebook page), over bim-open-flow's editor packages and the notebook and 3D pane (`pane-3d`) from `deps/bim-open-notebook`, all linked by `deps.config.ts` and `deps.tsconfig.json` |
 | `deps/bim-open-notebook/` | The notebook and the 3D pane (`@bimopenflow/bim-open-notebook`, `@bimopenflow/pane-3d`), from [bim-open-notebook](https://github.com/ara3d/bim-open-notebook); fetched by `node deps.mjs` |
+| `deps/bim-open-plot/` | The figure layer to come, from [bim-open-plot](https://github.com/ara3d/bim-open-plot): its brand and the chart-spec research, no code yet; fetched by `node deps.mjs` |
 | `deps/bim-open-viewer/` | The standalone 3D viewer workspace, seventeen packages |
 | `samples/` | Runnable sample analyses: BIM, NRC, Snowdon, 3D, and notebooks, with sample data (the tables samples are bim-open-flow's) |
 | `gates/` | Headless integration smoke checks |
@@ -273,4 +287,4 @@ assessment from 2026-09-08.
 
 ## License
 
-MIT, copyright (c) 2026 Ara 3D; see [LICENSE](LICENSE). The licence covers the code in this repository. It does not cover third-party building models, which stay under their owners' terms.
+MIT, copyright (c) 2026 Ara 3D; see [LICENSE](LICENSE). The licence covers the code in this repository. The sample building data keeps its own terms, listed in [NOTICE.md](NOTICE.md): the Duplex Apartment files are CC BY 4.0 from buildingSMART International ([samples/nrc/NOTICE.md](samples/nrc/NOTICE.md)); the Snowdon Towers sample is Autodesk's under CC BY-NC-SA 3.0 and was never committed, and this fork has removed the notebook, expected answers, and transcript computed from it ([samples/snowdon-analyses/NOTICE.md](samples/snowdon-analyses/NOTICE.md)); the public Schependomlaan and DigitalHub models are CC BY 4.0 and MIT (TKT-144).

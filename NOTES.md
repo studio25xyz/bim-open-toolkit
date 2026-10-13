@@ -15,7 +15,7 @@ Agents: append findings here (contract friction, surprises, perf numbers).
 - Ara3D.Ifc.Editing needed eight files, not six: IfcGuid.cs and IfcStepText.cs are required helpers. Namespace kept as Ara3D.Ifc.Tests (rename is a follow-up). net8.0-windows/x64, forced by Ara3D.IfcLoader's native web-ifc dll (fix-on-entry item 6 would relax this).
 - web-ifc-library.dll (native) now lives inside src/Ara3D.IfcLoader (was in sdk vendor/); consider LFS or a nuget-packaged native asset later.
 - Microsoft.Data.Sqlite was hardcoded in origin; now centralized as Ara3DMicrosoftDataSqliteVersion.
-- Ara3D.Ifc.Mesher carries PROGRESS.md + 17 WIP progress-notes docs — pruning candidates.
+- Ara3D.Ifc.Mesher carries PROGRESS.md + 17 WIP progress-notes docs — pruning candidates. (2026-10-11: deleted under TKT-216; the mesher's measurement is `deps/bim-open-data/bench/ifc-mesher/`.)
 
 ### Track D (PlatoFlow)
 - Acceptance met from this repo + submodule alone: npm install/build/check clean; vitest 997/997; intgate-smoke 13/13 with host converting repo data/duplex.ifc.
@@ -154,7 +154,7 @@ Agents: append findings here (contract friction, surprises, perf numbers).
 
 ### Track GEO (BimOpenFlow.Nodes.Geometry) â€” 19 tests
 - `InstanceStruct.EntityIndex` actually holds the STEP express id, not an index â€” misleading; worth renaming upstream or documenting in Ara3D.Models.
-- `Approach1Mesher.Build` with `includeGeometry: false` is pure C# â€” the native web-ifc dll never loads on this path; the windows/x64 constraint is inherited, not exercised.
+- `IfcMesher.Build` over the entity resolver is pure C#: the native web-ifc dll never loads on this path.
 - `DataTableBuilder.AddColumn(IDataColumn)` reuses live column objects; safe copying needs materializing via `Array.CreateInstance` â€” a shared "copy/select rows" helper may belong in Ara3D.DataTable.
 - Canonical cell-text join rules duplicate `Scalar.ToCanonicalText` from Expressions; promote to a shared table-utils module if a third pack needs them.
 - ModelGeometryCache is unbounded (TODO); host should own eviction. Instance table rebuilt per `view3d.instances` eval â€” cache it if eval frequency grows.
