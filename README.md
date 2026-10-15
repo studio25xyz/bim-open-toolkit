@@ -6,6 +6,8 @@ This is Studio 2.5's fork of the BIM Open Toolkit, created by Christopher Diggin
 
 The toolkit runs as a single user local process on model files. Studio 2.5 builds on it for enterprise work, where many teams share many models and connect them to the systems they already run. What Studio 2.5 adds above the open core is the harness that reaches the record and the environment that runs agents against it. Those layers live in Studio 2.5's own platform. Open tools that come out of that work will be added to this fork under the MIT licence.
 
+Studio 2.5 maintains this distribution in step with the upstream BIM Open Toolkit at Ara 3D, and Christopher Diggins remains its author.
+
 ## Our vision for open source
 
 At Studio 2.5, we believe the foundations of the built environment belong in the open. Our vision is an ecosystem where the way an asset is described can be read, used and improved by anyone who works on it.
