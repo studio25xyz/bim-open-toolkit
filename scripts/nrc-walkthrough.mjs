@@ -54,7 +54,7 @@ const DUPLEX_CAPTURES = [
   ["nrc-storey-carbon-chart", "answer", "table", "figure-3-storey-carbon-table.png",
     "Figure 3. The same aggregates in the Table tab."],
   ["nrc-property-values", "answer", "table", "figure-4-property-values-table.png",
-    "Figure 4. The 2,441 property values the byte-exact writer added to the Duplex, read back from duplex-enriched.ifc: element sets, storey and building summaries, and the provenance set."],
+    "Figure 4. The 2,469 property values the byte-exact writer added to the Duplex, read back from duplex-enriched.ifc: element sets, storey, building and zone summaries, and the provenance set."],
   // TKT-93 merged nrc-color-category and nrc-color-embodied-carbon into nrc-color-operational-
   // carbon (one "colour by an analytics column" flow); each figure sets answer's valueColumn
   // and colorMap through the host API before capture, as a user would from the param panel.
@@ -74,7 +74,7 @@ const DUPLEX_CAPTURES = [
   ["nrc-storey-of-element", "answer", "table", "figure-10-storey-of-element.png",
     "Figure 10. Elements per storey from the StoreyOfEntity view, which walks ContainedIn, PartOf, and MemberOf: Level 1 has 103, the count the hand-driven session missed."],
   ["nrc-color-operational-carbon", "answer", "view3d", "figure-13-picked-element-properties.png",
-    "Figure 13. A picked wall: the 3D pane lists its property sets, including the Pset_NRC sets the enrichment wrote.", [0.5, 0.55],
+    "Figure 13. A picked wall: the 3D pane lists its property sets, including the NRC_ sets the enrichment wrote.", [0.5, 0.55],
     { answer: { valueColumn: "OperationalCarbon_kgCO2e_per_year", colorMap: "viridis" } }],
 ];
 

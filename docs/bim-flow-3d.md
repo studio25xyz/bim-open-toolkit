@@ -60,6 +60,46 @@ Reset restores source placement, per-placement colors, camera and environment.
 The category legend counts source objects, including records without geometry.
 Object picking preserves the selected graph node.
 
+## Reviewing in the 3D pane
+
+The pane is a review surface as well as a picture (TKT-320, plan in
+`docs/plans/bidirectional-viewer.md`). Every control below adds or changes graph
+nodes through the editor's own edit operations, so the result is a graph a person
+could have built, one undo step per gesture, saved with the analysis. Nothing
+writes a file until Run.
+
+| Gesture or control | What happens |
+|---|---|
+| Click an element | It is highlighted in the viewer, the property panel shows its sets, and the status line counts the selection. Shift-click adds or removes an element; a click on empty space clears. |
+| Switch to the **Table** tab | The selected elements' rows are highlighted. The selection carries both the entity id and the GlobalId, so a table keyed by either matches. |
+| **Use selection** | Adds a `bim.selection` node holding the selected GlobalIds beside the shown node, or updates the one it added. Wire it into `view3d.isolate`, `table.filter`, `table.join` or `table.aggregate` to work over the selection. |
+| **Comment** | A form asks for a title, a comment and an author. **Add to graph** adds a `view3d.camera` node (the current camera and field of view) wired into a `bcf.issue` node (the selection, the texts, the creation time). Wire the issue into `bcf.topics` to preview and `bcf.write` to write; the BCF carries the camera as the topic's viewpoint, the comment under the topic, and the model file in its header. |
+| **Edit property** (in the property panel) | A form asks for a property set, a property name and a value. **Add to graph** adds a `table.inline` row wired into `sink.writePsets`, with `sourcePath` set to the model path when it is an IFC file and `targetPath` beside it with `-reviewed` in the name. Run performs the byte-exact write-back. |
+
+A GLB model carries no entity mapping, so a pick selects nothing and the status
+says so. **Use selection** stays disabled until an element is selected, and
+**Comment** until a model is loaded; a comment with nothing selected is a
+model-level topic with no element.
+
+## Text annotation
+
+`view3d.label` puts text over elements or groups (TKT-336). It adds `label`,
+`labelX`, `labelY` and `labelZ` to an instance table, and the 3D pane draws each
+non-null label as a small chip at its anchor that follows the camera.
+
+| Parameter | Meaning |
+|---|---|
+| `format` | The text, with `{Column}` or `{Column:0.0}` placeholders read from the `values` table (or from the instance table when `values` is not wired) |
+| `joinColumn` | The column that matches `values` rows to instances; default `entityId` |
+| `groupColumn` | Empty: one label per element. Set: one label per group value (a storey, a zone), anchored over the group's union box |
+| `limit` | At most this many labels; default 200, with a warning saying how many were dropped |
+
+Each label sits at the top centre of its element's or group's bounding box. An
+element whose value is missing gets no label. The pane draws at most 300 and
+says so in the status line ("300 of 512 labels shown"). Labels take no clicks,
+so picking still works. A notebook's recorded 3D view replays the same rows,
+so the labels draw with no host.
+
 ## Run locally
 
 Install dependencies in both `viewer` and `bimopenflow/web`; build the existing

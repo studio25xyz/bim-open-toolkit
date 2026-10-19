@@ -1,0 +1,378 @@
+{
+  "formatVersion": "0.1.0",
+  "layout": {
+    "modelPath": {
+      "x": 40,
+      "y": 975
+    },
+    "model": {
+      "x": 385,
+      "y": 891
+    },
+    "verdicts": {
+      "x": 2041,
+      "y": 1035
+    },
+    "doors": {
+      "x": 734,
+      "y": 328
+    },
+    "doorCols": {
+      "x": 1083,
+      "y": 365
+    },
+    "overall": {
+      "x": 734,
+      "y": 620
+    },
+    "overallCols": {
+      "x": 1083,
+      "y": 595
+    },
+    "doorWidth": {
+      "x": 1692,
+      "y": 468
+    },
+    "levelRows": {
+      "x": 1083,
+      "y": 1088
+    },
+    "levelCols": {
+      "x": 1692,
+      "y": 854
+    },
+    "withLevel": {
+      "x": 2041,
+      "y": 649
+    },
+    "widthMm": {
+      "x": 2390,
+      "y": 669
+    },
+    "verdictCols": {
+      "x": 2390,
+      "y": 1015
+    },
+    "checked": {
+      "x": 2752,
+      "y": 830
+    },
+    "margin": {
+      "x": 3101,
+      "y": 830
+    },
+    "columns": {
+      "x": 3450,
+      "y": 830
+    },
+    "sorted": {
+      "x": 3968,
+      "y": 830
+    },
+    "about": {
+      "x": 40,
+      "y": 40
+    },
+    "answer": {
+      "x": 4317,
+      "y": 736
+    },
+    "scene": {
+      "x": 3963,
+      "y": 1114
+    },
+    "coloured": {
+      "x": 4317,
+      "y": 1006
+    }
+  },
+  "structure": {
+    "inputs": [
+      {
+        "name": "model",
+        "kind": "FilePath",
+        "default": "{SAMPLES}/duplex-enriched.bos",
+        "description": "The building's BIM Open Schema (.bos) file; the NRC Duplex by default, any .bos file works here."
+      }
+    ],
+    "edges": [
+      {
+        "from": "modelPath.path",
+        "to": "model.path"
+      },
+      {
+        "from": "model.entities",
+        "to": "verdicts.entities"
+      },
+      {
+        "from": "model.parameters",
+        "to": "verdicts.parameters"
+      },
+      {
+        "from": "model.entities",
+        "to": "doors.table"
+      },
+      {
+        "from": "doors.table",
+        "to": "doorCols.table"
+      },
+      {
+        "from": "model.parameters",
+        "to": "overall.table"
+      },
+      {
+        "from": "overall.table",
+        "to": "overallCols.table"
+      },
+      {
+        "from": "doorCols.table",
+        "to": "doorWidth.a"
+      },
+      {
+        "from": "overallCols.table",
+        "to": "doorWidth.b"
+      },
+      {
+        "from": "model.parameters",
+        "to": "levelRows.table"
+      },
+      {
+        "from": "levelRows.table",
+        "to": "levelCols.table"
+      },
+      {
+        "from": "doorWidth.table",
+        "to": "withLevel.a"
+      },
+      {
+        "from": "levelCols.table",
+        "to": "withLevel.b"
+      },
+      {
+        "from": "withLevel.table",
+        "to": "widthMm.table"
+      },
+      {
+        "from": "verdicts.verdicts",
+        "to": "verdictCols.table"
+      },
+      {
+        "from": "widthMm.table",
+        "to": "checked.a"
+      },
+      {
+        "from": "verdictCols.table",
+        "to": "checked.b"
+      },
+      {
+        "from": "checked.table",
+        "to": "margin.table"
+      },
+      {
+        "from": "margin.table",
+        "to": "columns.table"
+      },
+      {
+        "from": "columns.table",
+        "to": "sorted.table"
+      },
+      {
+        "from": "sorted.table",
+        "to": "answer.table"
+      },
+      {
+        "from": "scene.instances",
+        "to": "coloured.instances"
+      },
+      {
+        "from": "sorted.table",
+        "to": "coloured.values"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "modelPath",
+        "kind": "value.path",
+        "version": 1
+      },
+      {
+        "id": "model",
+        "kind": "bos.load",
+        "version": 1
+      },
+      {
+        "id": "verdicts",
+        "kind": "ids.check",
+        "version": 1
+      },
+      {
+        "id": "doors",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "doorCols",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "overall",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "overallCols",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "doorWidth",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "levelRows",
+        "kind": "table.filter",
+        "version": 1
+      },
+      {
+        "id": "levelCols",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "withLevel",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "widthMm",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "verdictCols",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "checked",
+        "kind": "table.join",
+        "version": 1
+      },
+      {
+        "id": "margin",
+        "kind": "table.derive",
+        "version": 1
+      },
+      {
+        "id": "columns",
+        "kind": "table.project",
+        "version": 1
+      },
+      {
+        "id": "sorted",
+        "kind": "table.sort",
+        "version": 1
+      },
+      {
+        "id": "about",
+        "kind": "view.note",
+        "version": 1
+      },
+      {
+        "id": "answer",
+        "kind": "view.table",
+        "version": 1
+      },
+      {
+        "id": "scene",
+        "kind": "view3d.instances",
+        "version": 1
+      },
+      {
+        "id": "coloured",
+        "kind": "view3d.color",
+        "version": 1
+      }
+    ]
+  },
+  "values": {
+    "modelPath": {
+      "path": "$model"
+    },
+    "model": {
+      "harmonize": "false"
+    },
+    "verdicts": {
+      "ids": "{SAMPLES}/ids/dc-w1.ids"
+    },
+    "doors": {
+      "expr": "[Category] == 'IFCDOOR'"
+    },
+    "doorCols": {
+      "columns": "EntityIndex, GlobalId, Name"
+    },
+    "overall": {
+      "expr": "[Name] == 'Ifc:OverallWidth'"
+    },
+    "levelRows": {
+      "expr": "[Name] == 'Level' and [ParameterGroup] == 'PSet_Revit_Constraints'"
+    },
+    "levelCols": {
+      "columns": "EntityIndex, Value as Level"
+    },
+    "withLevel": {
+      "aKey": "EntityIndex",
+      "bKey": "EntityIndex",
+      "mode": "inner"
+    },
+    "overallCols": {
+      "columns": "EntityIndex, Value"
+    },
+    "doorWidth": {
+      "aKey": "EntityIndex",
+      "bKey": "EntityIndex",
+      "mode": "inner"
+    },
+    "widthMm": {
+      "name": "Width_mm",
+      "expr": "round(toNumber([Value]) * 1000)"
+    },
+    "verdictCols": {
+      "columns": "EntityIndex, Verdict"
+    },
+    "checked": {
+      "aKey": "EntityIndex",
+      "bKey": "EntityIndex",
+      "mode": "inner"
+    },
+    "margin": {
+      "name": "Margin_mm",
+      "expr": "[Width_mm] - 850"
+    },
+    "columns": {
+      "columns": "Name, Level, Width_mm, Margin_mm, Verdict, GlobalId"
+    },
+    "sorted": {
+      "A": "Verdict",
+      "B": "Width_mm",
+      "C": "Name"
+    },
+    "about": {
+      "text": "DC-W1 is the clear-width rule (a door leaf at least 850 mm wide, NBC 2020 3.8.3.12, illustrative, not legal text) with OverallWidth as the proxy, stated as an IDS (samples/nrc/ids/dc-w1.ids) and checked by ids.check over the Duplex. answer lists the 14 doors with their width, how far it is over or under 850 mm, and the verdict; coloured paints the verdicts on the model (the IFC at scene), matched on GlobalId."
+    },
+    "answer": {
+      "title": "DC-W1 door width verdicts",
+      "columns": "Name, Level, Width_mm, Margin_mm, Verdict, GlobalId"
+    },
+    "scene": {
+      "path": "{SAMPLES}/duplex-enriched.ifc"
+    },
+    "coloured": {
+      "joinColumn": "GlobalId",
+      "valueColumn": "Verdict",
+      "colorMap": "category10"
+    }
+  }
+}

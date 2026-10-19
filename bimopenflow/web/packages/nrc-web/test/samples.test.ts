@@ -43,7 +43,8 @@ function cell(snapshot: TableSnapshot, key: string, column: string): unknown {
 }
 
 function snapshotOf(embed: Embed | undefined): TableSnapshot {
-  if (!embed || !("snapshot" in embed)) throw new Error(`expected an embed with a snapshot, got ${embed?.kind}`);
+  // A view3d embed's snapshot is optional, so the check covers the value as well as the key.
+  if (!embed || !("snapshot" in embed) || !embed.snapshot) throw new Error(`expected an embed with a snapshot, got ${embed?.kind}`);
   return embed.snapshot;
 }
 
@@ -122,34 +123,35 @@ describe("sample notebooks", () => {
 describe("nrc-eight-questions", () => {
   const notebook = load("nrc-eight-questions");
 
-  it("asks the eight questions of samples/nrc/questions.txt verbatim, then one follow-up", () => {
+  it("asks the first eight questions of samples/nrc/questions.txt verbatim, then one follow-up", () => {
+    // The file also holds a ninth question, on zones, which this notebook does not ask.
     const questions = readFileSync(join(ROOT, "samples", "nrc", "questions.txt"), "utf8")
       .split(/\r?\n/)
       .filter((line) => line !== "" && !line.startsWith("#"));
-    expect(questions).toHaveLength(8);
+    expect(questions).toHaveLength(9);
     expect(notebook.turns).toHaveLength(9);
-    expect(notebook.turns.slice(0, 8).map((t) => t.request.text)).toEqual(questions);
+    expect(notebook.turns.slice(0, 8).map((t) => t.request.text)).toEqual(questions.slice(0, 8));
   });
 
   it("Q1 shows the total operational carbon as a value, 37,196.2 kgCO2e/yr", () => {
     const value = notebook.turns[0].reply.embeds.find((e) => e.kind === "value");
     expect(value?.kind === "value" && value.unit).toBe("kgCO2e/yr");
     const snapshot = snapshotOf(value);
-    expect(value?.kind === "value" && value.column).toBe("Total");
-    expect(snapshot.rows[0][snapshot.columns.findIndex((c) => c.name === "Total")]).toBeCloseTo(37196.2, 1);
+    expect(value?.kind === "value" && value.column).toBe("OperationalCarbon_kgCO2e_per_year");
+    expect(snapshot.rows[0][snapshot.columns.findIndex((c) => c.name === "OperationalCarbon_kgCO2e_per_year")]).toBeCloseTo(37196.2, 1);
   });
 
   it("Q7 finds the roof with no embodied-carbon value", () => {
     const snapshot = snapshotOf(notebook.turns[6].reply.embeds.find((e) => e.kind === "table"));
     expect(snapshot.totalRows).toBe(1);
-    expect(snapshot.rows[0][0]).toBe("0jf0rYHfX3RAB3bSIRjmxl");
+    expect(snapshot.rows[0][snapshot.columns.findIndex((c) => c.name === "GlobalId")]).toBe("0jf0rYHfX3RAB3bSIRjmxl");
   });
 
   it("Q8 carries the embodied carbon A1-A3 of each storey", () => {
     const snapshot = snapshotOf(notebook.turns[7].reply.embeds.find((e) => e.kind === "table"));
     const expected = { "Level 1": 49451.2, "Level 2": 48696.8, "T/FDN": 11761.3, Roof: 5821.0 };
     for (const [storey, embodied] of Object.entries(expected))
-      expect(cell(snapshot, storey, "Embodied")).toBeCloseTo(embodied, 1);
+      expect(cell(snapshot, storey, "EmbodiedCarbon_A1A3_kgCO2e")).toBeCloseTo(embodied, 1);
   });
 
   it("ends with a chart", () => {
