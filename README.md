@@ -27,8 +27,8 @@ Studio 2.5 takes its inspiration from [From Hierarchy to Intelligence](https://b
 > **About this fork: read this first.**
 >
 > - **Origin.** This is the Studio 2.5 fork of [ara3d/bim-open-toolkit](https://github.com/ara3d/bim-open-toolkit). The toolkit was created by Christopher Diggins at Ara 3D, who holds the copyright, and is released under the MIT licence.
-> - **Pre-release.** This is version 0.1 software under active development. It is provided as is, without warranty of any kind, and is not presented as production ready. Interfaces, file formats, and documents may change.
-> - **Dependencies belong to Ara 3D.** The schema, data, flow, viewer, and notebook code, and three supporting libraries, live in eight separate `ara3d` repositories that `node deps.mjs` fetches at pinned commits. Studio 2.5 does not maintain those repositories.
+> - **Pre-release.** This is version 0.2 software under active development. It is provided as is, without warranty of any kind, and is not presented as production ready. Interfaces, file formats, and documents may change.
+> - **Dependencies belong to Ara 3D.** The schema, data, flow, viewer, notebook, and plot code, and three supporting libraries, live in nine separate `ara3d` repositories that `node deps.mjs` fetches at pinned commits. Studio 2.5 does not maintain those repositories.
 > - **One extra setup step.** The .NET build needs the packages `Platonic.Core` and `Platonic.Analyzers` 0.1.0, which are not on nuget.org yet. [Platonic packages](#platonic-packages) below gives the three commands.
 > - **Sample models.** The MIT licence covers the code, not third-party building models. No model file, image, or sample notebook from Autodesk's Snowdon Towers sample is included in this fork; the demos that name it need your own copy, used under Autodesk's licence terms. Other sample models remain under their owners' terms.
 > - **Browser demos.** The `ara3d.github.io` links below open Ara 3D's published pages, not pages hosted by Studio 2.5.
