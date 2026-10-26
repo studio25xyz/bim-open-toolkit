@@ -17,7 +17,11 @@
   },
   "bim-open-data": {
     "url": "https://github.com/ara3d/bim-open-data",
-    "commit": "a4298c870bdb4b0c93014ed9203fcd0790b30409"
+    "commit": "047670a70232826f0f30c1112d327cff6c05a9ff"
+  },
+  "plato-brep": {
+    "url": "https://github.com/cdiggins/plato-brep",
+    "commit": "4073de364596c531d3b0b6b692bd6ebee5095a37"
   },
   "ara3d-dataflow": {
     "url": "https://github.com/ara3d/ara3d-dataflow",
